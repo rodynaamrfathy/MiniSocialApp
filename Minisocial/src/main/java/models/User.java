@@ -7,11 +7,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import java.util.Set;
+
+
 @Entity
 public class User {
 
-	
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int userId;
@@ -36,6 +37,15 @@ public class User {
 	
 	@Column(length = 50)
 	private String role;
+	
+	@OneToMany(mappedBy = "user")
+    private Set<Friendships> friendships;
+	
+	@OneToMany(mappedBy = "requester")
+	private Set<FriendshipRequests> sentRequests;
+
+	@OneToMany(mappedBy = "receiver")
+	private Set<FriendshipRequests> receivedRequests;
 	
 	public int getUserId() {
 		return userId;
