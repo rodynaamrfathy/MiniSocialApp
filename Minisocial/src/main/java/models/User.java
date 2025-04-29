@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Set;
+
 import javax.persistence.*;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,12 +11,10 @@ import javax.persistence.Id;
 
 @Entity
 public class User {
-
-	
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int userId;
+	private Long userId;
 	
 	@Column(name= "first_name", length = 50)
 	private String firstName;
@@ -37,11 +37,14 @@ public class User {
 	@Column(length = 50)
 	private String role;
 	
-	public int getUserId() {
+	@ManyToMany(mappedBy="members")
+	private Set<Group> groups;
+	
+	public Long getUserId() {
 		return userId;
 	}
 
-	public void setUserId(int userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 
@@ -101,7 +104,15 @@ public class User {
 		this.role = role;
 	}
 
+	public Set<Group> getGroups() {
+	    return groups;
+	}
 
+	public void setGroups(Set<Group> groups) {
+	    this.groups = groups;
+	}
+
+	
 	@Override
 	public String toString() {
 	    return "User{" +
@@ -112,13 +123,7 @@ public class User {
 	            ", email='" + email + '\'' +
 	            ", bio='" + bio + '\'' +
 	            ", role='" + role + '\'' +
+	            ", groupsCount=" + (groups != null ? groups.size() : 0) +
 	            '}';
 	}
-
-
-
-
-
-    
-
 }
