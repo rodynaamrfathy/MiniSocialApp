@@ -1,4 +1,4 @@
-package ejbs;
+package models;
 import javax.ejb.Stateless;
 
 @Stateless

@@ -6,7 +6,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-import ejbs.User;
+import models.User;
 
 @Stateless
 public class UserService {

@@ -7,7 +7,7 @@ import javax.ws.rs.*;
 
 import javax.ws.rs.core.MediaType;
 
-import ejbs.User;
+import models.User;
 import service.UserService;
 
 @Path("/users")
