@@ -1,6 +1,5 @@
 package ejbs;
 
-import java.util.Date;
 
 import javax.ejb.Stateless;
 import javax.persistence.Column;
@@ -10,14 +9,12 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+
 
 @Stateless
 @Entity
 public class User {
 
-	public enum Role { user , admin};
 	
 	
 	@Id
@@ -42,10 +39,91 @@ public class User {
 	@Column(length = 50)
 	private String bio;
 	
-	@Temporal(TemporalType.DATE)
-	private Date birthdate;
+	@Column(length = 50)
+	private String role;
 	
-	@Enumerated(EnumType.STRING)
-	@Column(columnDefinition = "ENUM('user', 'admin')")
-	private Role role;
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public String getUserName() {
+		return userName;
+	}
+
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getPassword() {
+		return password;
+	}
+
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getBio() {
+		return bio;
+	}
+
+	public void setBio(String bio) {
+		this.bio = bio;
+	}
+
+	public String getRole() {
+		return role;
+	}
+
+	public void setRole(String role) {
+		this.role = role;
+	}
+
+
+	@Override
+	public String toString() {
+	    return "User{" +
+	            "userId=" + userId +
+	            ", firstName='" + firstName + '\'' +
+	            ", lastName='" + lastName + '\'' +
+	            ", userName='" + userName + '\'' +
+	            ", email='" + email + '\'' +
+	            ", bio='" + bio + '\'' +
+	            ", role='" + role + '\'' +
+	            '}';
+	}
+
+
+
+
+
+    
+
 }
