@@ -39,14 +39,38 @@ public class User {
 	private String role;
 	
 	@OneToMany(mappedBy = "user")
-    private Set<Friendships> friendships;
+    private Set<Friendships> friendships; // U1 <-> U2
 	
 	@OneToMany(mappedBy = "requester")
-	private Set<FriendshipRequests> sentRequests;
+	private Set<FriendshipRequests> sentRequests;  // U1 -> U2
 
 	@OneToMany(mappedBy = "receiver")
-	private Set<FriendshipRequests> receivedRequests;
+	private Set<FriendshipRequests> receivedRequests; // U2 <- U1
 	
+	public Set<Friendships> getFriendships() {
+		return friendships;
+	}
+
+	public void setFriendships(Set<Friendships> friendships) {
+		this.friendships = friendships;
+	}
+
+	public Set<FriendshipRequests> getSentRequests() {
+		return sentRequests;
+	}
+
+	public void setSentRequests(Set<FriendshipRequests> sentRequests) {
+		this.sentRequests = sentRequests;
+	}
+
+	public Set<FriendshipRequests> getReceivedRequests() {
+		return receivedRequests;
+	}
+
+	public void setReceivedRequests(Set<FriendshipRequests> receivedRequests) {
+		this.receivedRequests = receivedRequests;
+	}
+
 	public int getUserId() {
 		return userId;
 	}
@@ -124,11 +148,5 @@ public class User {
 	            ", role='" + role + '\'' +
 	            '}';
 	}
-
-
-
-
-
-    
 
 }

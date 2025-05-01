@@ -18,11 +18,11 @@ public class FriendshipRequests {
 
     @ManyToOne
     @JoinColumn(name = "requester_id")
-    private User requester;
+    private User requester; 
 
     @ManyToOne
     @JoinColumn(name = "receiver_id")
-    private User receiver;
+    private User receiver; 
 
     private FriendshipStatus status;
     
