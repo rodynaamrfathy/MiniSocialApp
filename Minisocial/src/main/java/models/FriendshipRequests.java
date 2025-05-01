@@ -1,10 +1,6 @@
 package models;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 import java.time.LocalDate; 
 import enums.FriendshipStatus;
@@ -18,14 +14,15 @@ public class FriendshipRequests {
 
     @ManyToOne
     @JoinColumn(name = "requester_id")
-    private User requester;
+    private User requester; 
 
     @ManyToOne
     @JoinColumn(name = "receiver_id")
-    private User receiver;
+    private User receiver; 
 
     private FriendshipStatus status;
     
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDate timestamp;
     
     public FriendshipRequests () {}

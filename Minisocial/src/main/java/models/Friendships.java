@@ -1,10 +1,6 @@
 package models;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 import java.time.LocalDate; 
 
@@ -23,6 +19,7 @@ public class Friendships {
     @JoinColumn(name = "friend_id")
     private User friend;
     
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDate since;
     
     public Friendships() {}

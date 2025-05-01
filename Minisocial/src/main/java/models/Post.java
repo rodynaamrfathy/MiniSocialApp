@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.*;
 import javax.persistence.MappedSuperclass;
@@ -19,16 +20,16 @@ public abstract class Post {
 	@Column(length = 50)
 	protected String content;
 	
-    /*
+ 
     @OneToMany(mappedBy = "post")  // 'post' in Comment class
-    private List<Comment> comments;  // List of comments related to this post
-    */
+    private Set<Comment> comments;  // List of comments related to this post
+    
 	
-    /*
+    
     @OneToMany(mappedBy = "post")  // 'post' in Like class
-    private List<Like> likes;  // List of likes related to this post
-    */
+    private Set<Like> likes;  // List of likes related to this post
+   
 	
-	private int likesCount;
+	protected int likesCount;
 
 }

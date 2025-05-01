@@ -3,12 +3,8 @@ package models;
 import java.util.Set;
 
 import javax.persistence.*;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 
@@ -39,21 +35,60 @@ public class User {
 	
 	@Column(length = 50)
 	private String role;
-	
 
 	@ManyToMany(mappedBy="members")
 	private Set<Group> groups;
 	
 
+
+  @Temporal(TemporalType.TIMESTAMP)
+   private LocalDate birthdate;
+	
+    @OneToMany(mappedBy = "user")
+    private Set<Like> listOfLikedPosts;
+	
+    @OneToMany(mappedBy = "creator")
+    private Set<Comment> commentsList;
+	
 	@OneToMany(mappedBy = "user")
-    private Set<Friendships> friendships;
+	private Set<GroupPost> groupPosts;
+
+	@OneToMany(mappedBy = "user")
+	private Set<UserPost> userPosts;
+	
+	@OneToMany(mappedBy = "user")
+    private Set<Friendships> friendships; // U1 <-> U2
 	
 	@OneToMany(mappedBy = "requester")
-	private Set<FriendshipRequests> sentRequests;
+	private Set<FriendshipRequests> sentRequests;  // U1 -> U2
 
 	@OneToMany(mappedBy = "receiver")
-	private Set<FriendshipRequests> receivedRequests;
+	private Set<FriendshipRequests> receivedRequests; // U2 <- U1
 	
+	public Set<Friendships> getFriendships() {
+		return friendships;
+	}
+
+	public void setFriendships(Set<Friendships> friendships) {
+		this.friendships = friendships;
+	}
+
+	public Set<FriendshipRequests> getSentRequests() {
+		return sentRequests;
+	}
+
+	public void setSentRequests(Set<FriendshipRequests> sentRequests) {
+		this.sentRequests = sentRequests;
+	}
+
+	public Set<FriendshipRequests> getReceivedRequests() {
+		return receivedRequests;
+	}
+
+	public void setReceivedRequests(Set<FriendshipRequests> receivedRequests) {
+		this.receivedRequests = receivedRequests;
+	}
+
 	public int getUserId() {
     return userId;
 	}
@@ -118,12 +153,38 @@ public class User {
 		this.role = role;
 	}
 
+
 	public Set<Group> getGroups() {
 	    return groups;
 	}
 
 	public void setGroups(Set<Group> groups) {
 	    this.groups = groups;
+	}
+
+
+	public Set<Comment> getCommentsList() {
+		return commentsList;
+	}
+
+	public void setCommentsList(Set<Comment> commentsList) {
+		this.commentsList = commentsList;
+	}
+
+	public Set<GroupPost> getGroupPosts() {
+		return groupPosts;
+	}
+
+	public void setGroupPosts(Set<GroupPost> groupPosts) {
+		this.groupPosts = groupPosts;
+	}
+
+	public Set<UserPost> getUserPosts() {
+		return userPosts;
+	}
+
+	public void setUserPosts(Set<UserPost> userPosts) {
+		this.userPosts = userPosts;
 	}
 
 	
@@ -140,4 +201,7 @@ public class User {
 	            ", groupsCount=" + (groups != null ? groups.size() : 0) +
 	            '}';
 	}
+
+
 }
+
