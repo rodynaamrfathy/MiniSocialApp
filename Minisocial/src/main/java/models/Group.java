@@ -3,11 +3,6 @@ package models;
 import java.util.Set;
 
 import javax.persistence.*;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 @Entity
 public class Group {
@@ -22,12 +17,19 @@ public class Group {
 	@Column
 	private Boolean isOpen;
 	
+	@OneToMany(mappedBy="postId")
+	private Set<GroupPost> groupPosts;
+	
     @ManyToMany
     @JoinTable(
-    		name="GroupMembership",
+    		name="GroupAdmin",
     		joinColumns=@JoinColumn(name="groupId"),
     		inverseJoinColumns=@JoinColumn(name="userId"))
-    private Set<User> members;
+    private Set<User> groupAdmins;
+	
+    @OneToMany(mappedBy = "group")
+    private Set<GroupMembership> memberships;
+
 	
     public Long getGroupId() {
         return groupId;
@@ -53,13 +55,6 @@ public class Group {
         this.isOpen = isOpen;
     }
     
-    public Set<User> getMembers() {
-        return members;
-    }
-
-    public void setMembers(Set<User> members) {
-        this.members = members;
-    }
 
 
     @Override
@@ -68,7 +63,6 @@ public class Group {
                 "groupId=" + groupId +
                 ", groupName='" + groupName + '\'' +
                 ", isOpen=" + isOpen +
-                ", membersCount=" + (members != null ? members.size() : 0) +
                 '}';
     }
 }

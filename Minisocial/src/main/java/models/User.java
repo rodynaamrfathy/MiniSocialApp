@@ -1,11 +1,12 @@
 package models;
 
+import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.*;
 
-import java.time.LocalDate;
-import java.util.Set;
+import enums.RoleEnum;
+
 
 
 @Entity
@@ -33,16 +34,17 @@ public class User {
 	@Column(length = 50)
 	private String bio;
 	
-	@Column(length = 50)
-	private String role;
+	@Enumerated(EnumType.STRING) 
+	private RoleEnum role;
 
-	@ManyToMany(mappedBy="members")
-	private Set<Group> groups;
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private Set<GroupMembership> memberships;
 	
+	@ManyToMany(mappedBy="groupAdmins")
+	private Set<Group> adminOfGroups;
 
-
-  @Temporal(TemporalType.TIMESTAMP)
-   private LocalDate birthdate;
+    @Temporal(TemporalType.DATE)
+    private Date birthdate;
 	
     @OneToMany(mappedBy = "user")
     private Set<Like> listOfLikedPosts;
@@ -89,7 +91,7 @@ public class User {
 		this.receivedRequests = receivedRequests;
 	}
 
-	public int getUserId() {
+	public Long getUserId() {
     return userId;
 	}
 
@@ -145,21 +147,12 @@ public class User {
 		this.bio = bio;
 	}
 
-	public String getRole() {
+	public RoleEnum getRole() {
 		return role;
 	}
 
-	public void setRole(String role) {
+	public void setRole(RoleEnum role) {
 		this.role = role;
-	}
-
-
-	public Set<Group> getGroups() {
-	    return groups;
-	}
-
-	public void setGroups(Set<Group> groups) {
-	    this.groups = groups;
 	}
 
 
@@ -198,7 +191,6 @@ public class User {
 	            ", email='" + email + '\'' +
 	            ", bio='" + bio + '\'' +
 	            ", role='" + role + '\'' +
-	            ", groupsCount=" + (groups != null ? groups.size() : 0) +
 	            '}';
 	}
 

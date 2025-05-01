@@ -7,20 +7,14 @@ import javax.persistence.*;
 @Table(name = "groupposts")
 public class GroupPost extends Post {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int groupPostId;
     
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "userId")
     private User user;
     
     
-    
-    /*
-     * the connection with the group
     @ManyToOne
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "groupId")
     private Group group;
-    */
+    
 }

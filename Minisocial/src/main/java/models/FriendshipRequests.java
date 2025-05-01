@@ -2,7 +2,8 @@ package models;
 
 import javax.persistence.*;
 
-import java.time.LocalDate; 
+import java.util.Date;
+
 import enums.FriendshipStatus;
 
 @Entity
@@ -20,10 +21,11 @@ public class FriendshipRequests {
     @JoinColumn(name = "receiver_id")
     private User receiver; 
 
+    @Enumerated(EnumType.STRING) 
     private FriendshipStatus status;
     
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDate timestamp;
+    @Temporal(TemporalType.DATE)
+    private Date timestamp;
     
     public FriendshipRequests () {}
 
@@ -59,11 +61,11 @@ public class FriendshipRequests {
         this.status = status;
     }
     
-    public LocalDate getTimeStamp() {
+    public Date getTimeStamp() {
 		return timestamp;
 	}
 
-	public void setTimeStamp(LocalDate timestamp) {
+	public void setTimeStamp(Date timestamp) {
 		this.timestamp = timestamp;
 	}
 }

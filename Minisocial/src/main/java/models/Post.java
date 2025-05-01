@@ -4,12 +4,15 @@ import java.util.Date;
 import java.util.Set;
 
 import javax.persistence.*;
-import javax.persistence.MappedSuperclass;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name = "post_type")
 public abstract class Post {
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int postId;
 	
 	@Temporal(TemporalType.DATE)
 	protected Date publishDate;

@@ -2,7 +2,7 @@ package models;
 
 import javax.persistence.*;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 @Entity
 @Table(name = "comments")
@@ -12,10 +12,10 @@ public class Comment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
     private int commentId;
-
+    
     @ManyToOne
-    @JoinColumn(name = "post_id")
-    private Post post;
+    @JoinColumn(name = "post_id") // foreign key from Post hierarchy
+    private Post post; // polymorphic
 
     @ManyToOne
     @JoinColumn(name = "creator_id")
@@ -25,8 +25,8 @@ public class Comment {
     private String content;
 
     @Column(name = "timestamp")
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDate timestamp;
+    @Temporal(TemporalType.DATE)
+    private Date timestamp;
 
     // Getters and Setters
     public int getCommentId() {
@@ -61,11 +61,11 @@ public class Comment {
         this.content = content;
     }
 
-    public LocalDate getTimestamp() {
+    public Date getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(LocalDate timestamp) {
+    public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 

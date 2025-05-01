@@ -2,7 +2,7 @@ package models;
 
 import javax.persistence.*;
 
-import java.time.LocalDate; 
+import java.util.Date; 
 
 @Entity
 public class Friendships {
@@ -19,8 +19,8 @@ public class Friendships {
     @JoinColumn(name = "friend_id")
     private User friend;
     
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDate since;
+    @Temporal(TemporalType.DATE)
+    private Date since;
     
     public Friendships() {}
     
@@ -48,11 +48,11 @@ public class Friendships {
 		this.friend = friend;
 	}
 	
-	public LocalDate getSince() {
+	public Date getSince() {
 		return since;
 	}
 
-	public void setSince(LocalDate since) {
+	public void setSince(Date since) {
 		this.since = since;
 	}
     
