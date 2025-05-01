@@ -43,37 +43,6 @@ public class User {
     @OneToMany(mappedBy = "creator")
     private Set<Comment> commentsList;
 	
-	public Set<Comment> getCommentsList() {
-		return commentsList;
-	}
-
-	public void setCommentsList(Set<Comment> commentsList) {
-		this.commentsList = commentsList;
-	}
-
-	public Set<GroupPost> getGroupPosts() {
-		return groupPosts;
-	}
-
-	public void setGroupPosts(Set<GroupPost> groupPosts) {
-		this.groupPosts = groupPosts;
-	}
-
-	public Set<UserPost> getUserPosts() {
-		return userPosts;
-	}
-
-	public void setUserPosts(Set<UserPost> userPosts) {
-		this.userPosts = userPosts;
-	}
-
-
-	@OneToMany(mappedBy = "user")
-	private Set<GroupPost> groupPosts;
-	
-	@OneToMany(mappedBy = "user")
-	private Set<UserPost> userPosts;
-	
 	@OneToMany(mappedBy = "user")
 	private Set<GroupPost> groupPosts;
 	
@@ -177,7 +146,30 @@ public class User {
 		this.role = role;
 	}
 
+	public Set<Comment> getCommentsList() {
+		return commentsList;
+	}
 
+	public void setCommentsList(Set<Comment> commentsList) {
+		this.commentsList = commentsList;
+	}
+
+	public Set<GroupPost> getGroupPosts() {
+		return groupPosts;
+	}
+
+	public void setGroupPosts(Set<GroupPost> groupPosts) {
+		this.groupPosts = groupPosts;
+	}
+
+	public Set<UserPost> getUserPosts() {
+		return userPosts;
+	}
+
+	public void setUserPosts(Set<UserPost> userPosts) {
+		this.userPosts = userPosts;
+	}
+	
 	@Override
 	public String toString() {
 	    return "User{" +
