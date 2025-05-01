@@ -39,6 +39,12 @@ public class User {
 	private String role;
 	
 	@OneToMany(mappedBy = "user")
+	private Set<GroupPost> groupPosts;
+	
+	@OneToMany(mappedBy = "user")
+	private Set<UserPost> userPosts;
+	
+	@OneToMany(mappedBy = "user")
     private Set<Friendships> friendships; // U1 <-> U2
 	
 	@OneToMany(mappedBy = "requester")

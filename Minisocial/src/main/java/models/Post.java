@@ -29,6 +29,6 @@ public abstract class Post {
     private List<Like> likes;  // List of likes related to this post
     */
 	
-	private int likesCount;
+	protected int likesCount;
 
 }
