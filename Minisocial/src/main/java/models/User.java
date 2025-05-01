@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Set;
+
 import javax.persistence.*;
 
 import java.time.LocalDate;
@@ -11,7 +13,7 @@ public class User {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int userId;
+	private Long userId;
 	
 	@Column(name= "first_name", length = 50)
 	private String firstName;
@@ -33,9 +35,14 @@ public class User {
 	
 	@Column(length = 50)
 	private String role;
+
+	@ManyToMany(mappedBy="members")
+	private Set<Group> groups;
 	
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDate birthdate;
+
+
+  @Temporal(TemporalType.TIMESTAMP)
+   private LocalDate birthdate;
 	
     @OneToMany(mappedBy = "user")
     private Set<Like> listOfLikedPosts;
@@ -45,7 +52,7 @@ public class User {
 	
 	@OneToMany(mappedBy = "user")
 	private Set<GroupPost> groupPosts;
-	
+
 	@OneToMany(mappedBy = "user")
 	private Set<UserPost> userPosts;
 	
@@ -83,10 +90,10 @@ public class User {
 	}
 
 	public int getUserId() {
-		return userId;
+    return userId;
 	}
 
-	public void setUserId(int userId) {
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
 
@@ -146,6 +153,16 @@ public class User {
 		this.role = role;
 	}
 
+
+	public Set<Group> getGroups() {
+	    return groups;
+	}
+
+	public void setGroups(Set<Group> groups) {
+	    this.groups = groups;
+	}
+
+
 	public Set<Comment> getCommentsList() {
 		return commentsList;
 	}
@@ -169,6 +186,7 @@ public class User {
 	public void setUserPosts(Set<UserPost> userPosts) {
 		this.userPosts = userPosts;
 	}
+
 	
 	@Override
 	public String toString() {
@@ -180,7 +198,10 @@ public class User {
 	            ", email='" + email + '\'' +
 	            ", bio='" + bio + '\'' +
 	            ", role='" + role + '\'' +
+	            ", groupsCount=" + (groups != null ? groups.size() : 0) +
 	            '}';
 	}
 
+
 }
+
