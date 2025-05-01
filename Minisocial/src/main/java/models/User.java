@@ -9,9 +9,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import java.util.Set;
+
+
 @Entity
 public class User {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long userId;
@@ -37,11 +40,22 @@ public class User {
 	@Column(length = 50)
 	private String role;
 	
+
 	@ManyToMany(mappedBy="members")
 	private Set<Group> groups;
 	
-	public Long getUserId() {
-		return userId;
+
+	@OneToMany(mappedBy = "user")
+    private Set<Friendships> friendships;
+	
+	@OneToMany(mappedBy = "requester")
+	private Set<FriendshipRequests> sentRequests;
+
+	@OneToMany(mappedBy = "receiver")
+	private Set<FriendshipRequests> receivedRequests;
+	
+	public int getUserId() {
+    return userId;
 	}
 
 	public void setUserId(Long userId) {
