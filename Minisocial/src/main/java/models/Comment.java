@@ -1,7 +1,8 @@
 package models;
 
 import javax.persistence.*;
-import java.util.Date;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "comments")
@@ -25,7 +26,7 @@ public class Comment {
 
     @Column(name = "timestamp")
     @Temporal(TemporalType.TIMESTAMP)
-    private Date timestamp;
+    private LocalDate timestamp;
 
     // Getters and Setters
     public int getCommentId() {
@@ -60,11 +61,11 @@ public class Comment {
         this.content = content;
     }
 
-    public Date getTimestamp() {
+    public LocalDate getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(LocalDate timestamp) {
         this.timestamp = timestamp;
     }
 

@@ -1,12 +1,8 @@
 package models;
 
 import javax.persistence.*;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 
@@ -38,6 +34,40 @@ public class User {
 	@Column(length = 50)
 	private String role;
 	
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDate birthdate;
+	
+    @OneToMany(mappedBy = "user")
+    private Set<Like> listOfLikedPosts;
+	
+    @OneToMany(mappedBy = "creator")
+    private Set<Comment> commentsList;
+	
+	public Set<Comment> getCommentsList() {
+		return commentsList;
+	}
+
+	public void setCommentsList(Set<Comment> commentsList) {
+		this.commentsList = commentsList;
+	}
+
+	public Set<GroupPost> getGroupPosts() {
+		return groupPosts;
+	}
+
+	public void setGroupPosts(Set<GroupPost> groupPosts) {
+		this.groupPosts = groupPosts;
+	}
+
+	public Set<UserPost> getUserPosts() {
+		return userPosts;
+	}
+
+	public void setUserPosts(Set<UserPost> userPosts) {
+		this.userPosts = userPosts;
+	}
+
+
 	@OneToMany(mappedBy = "user")
 	private Set<GroupPost> groupPosts;
 	
