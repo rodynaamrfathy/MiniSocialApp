@@ -4,26 +4,47 @@ import javax.persistence.*;
 
 import java.util.Date;
 
+/**
+ * 💬 Comment – Relationships Summary 💬
+ *
+ * Represents a user comment on a post.
+ * 
+ * [Comment] ---N-------------------> [Post]       (N : 1)
+ * [Comment] ---N-------------------> [User]       (N : 1) (creator)
+ * 
+ * Fields:
+ *   - content
+ *   - timestamp
+ *
+ * Legend:
+ *   -->  Many-to-One (N:1)
+ */
+
 @Entity
 @Table(name = "comments")
 public class Comment {
 
+    /** 🔑 Unique comment ID */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "comment_id")
     private int commentId;
-    
-    @ManyToOne
-    @JoinColumn(name = "post_id") // foreign key from Post hierarchy
-    private Post post; // polymorphic
 
+    /** 🧱 Target post (polymorphic - can be any Post subtype) */
+    @ManyToOne
+    @JoinColumn(name = "post_id")
+    private Post post;
+
+    /** 👤 Author of the comment */
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User creator;
 
+    /** 📝 Text content of the comment (Max 50 chars) */
     @Column(name = "content", length = 50)
     private String content;
 
+    /** 🕒 Timestamp when the comment was made */
     @Column(name = "timestamp")
     @Temporal(TemporalType.DATE)
     private Date timestamp;
