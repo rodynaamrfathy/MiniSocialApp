@@ -2,7 +2,7 @@ package models;
 
 import java.util.Date;
 import javax.persistence.*;
-import enums.StatusEnum;
+import enums.GroupMemberShipStatusEnum;
 
 /**
  * 🤝 Represents a user’s membership in a group.
@@ -41,7 +41,7 @@ public class GroupMembership {
 
     /** 📌 Current membership status (ACTIVE, PENDING, etc.) */
     @Enumerated(EnumType.STRING)
-    private StatusEnum status;
+    private GroupMemberShipStatusEnum status;
 
     // Getters & Setters...
 }
