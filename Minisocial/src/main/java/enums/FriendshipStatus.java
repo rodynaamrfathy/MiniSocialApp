@@ -2,6 +2,6 @@ package enums;
 
 public enum FriendshipStatus {
 	PENDING,
-    APPROVED,
+    ACCEPTED,
     REJECTED
 }
