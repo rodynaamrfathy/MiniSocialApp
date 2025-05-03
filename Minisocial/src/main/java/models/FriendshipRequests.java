@@ -6,26 +6,45 @@ import java.util.Date;
 
 import enums.FriendshipStatus;
 
+/**
+ * 📨 FriendshipRequests Entity – Relationships Summary 📮
+ * 
+ * Represents a pending or past request:
+ * 
+ * [User] ---1---------------------< [FriendshipRequests] >---------------------1--- [User]
+ *       (as requester)                                       (as receiver)
+ * 
+ * Each row is a friend request from one user to another.
+ * Status is tracked using Enum: PENDING, ACCEPTED, REJECTED.
+ */
+
 @Entity
 public class FriendshipRequests {
 
+    // 🔑 Primary Key
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int friendship_request_id;
 
+    // 👈 Many requests by same requester (User)
     @ManyToOne
     @JoinColumn(name = "requester_id")
-    private User requester; 
+    private User requester;
 
+    // 👉 Many requests received by same receiver (User)
     @ManyToOne
     @JoinColumn(name = "receiver_id")
-    private User receiver; 
+    private User receiver;
 
-    @Enumerated(EnumType.STRING) 
+    // 📌 Enum for request status (PENDING, ACCEPTED, REJECTED)
+    @Enumerated(EnumType.STRING)
     private FriendshipStatus status;
-    
+
+    // ⏰ Timestamp of the request
     @Temporal(TemporalType.DATE)
     private Date timestamp;
+
+    // ✅ All Getters & Setters...
     
     public FriendshipRequests () {}
 

@@ -1,3 +1,6 @@
 eclipse.preferences.version=1
+encoding//src/main/java/models/FriendshipRequests.java=UTF-8
+encoding//src/main/java/models/Friendships.java=UTF-8
+encoding//src/main/java/models/User.java=UTF-8
 encoding//src/main/java/recources/UserResource.java=UTF-8
 encoding/<project>=windows-1252

@@ -2,97 +2,103 @@ package models;
 
 import java.util.Date;
 import java.util.Set;
-
 import javax.persistence.*;
-
 import enums.RoleEnum;
 
+/**
+ * 🧑‍💼 User Entity – Relationships Summary 🍙
+ * 
+ * [User] -------------------------< [GroupMembership]       (1 : N)
+ * [User] -------------------------< [GroupPost]             (1 : N)
+ * [User] -------------------------< [UserPost]              (1 : N)
+ * [User] -------------------------< [Comment]               (1 : N)
+ * [User] -------------------------< [Like]                  (1 : N)
+ * [User] ------------------------<> [Group] (as Admin)      (M : N)
+ * [User] -------------------------< [Friendships]           (1 : N)
+ * [User] ----- (sent) ------------< [FriendshipRequests]    (1 : N)
+ * [User] ----- (received) --------< [FriendshipRequests]    (1 : N)
+ *
+ * Legend:
+ *   -->  One-to-Many (1:N)
+ *   <--> Many-to-Many (M:N)
+ */
 
 
 @Entity
 public class User {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long userId;
-	
-	@Column(name= "first_name", length = 50)
-	private String firstName;
-	
-	@Column(name= "last_name", length = 50)
-	private String lastName;
-	
-	@Column(name= "user_name", length= 50, unique = true)
-	private String userName;
-	
-	@Column(length = 50, unique = true)
-	private String email;
-	
-	@Column(length = 50)
-	private String password;
-	
-	@Column(length = 50)
-	private String bio;
-	
-	@Enumerated(EnumType.STRING) 
-	private RoleEnum role;
+    // 🔑 Primary Key
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
 
-	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-	private Set<GroupMembership> memberships;
-	
-	@ManyToMany(mappedBy="groupAdmins")
-	private Set<Group> adminOfGroups;
+    // 📋 User Info
+    @Column(length = 50)
+    private String firstName;
+
+    @Column(length = 50)
+    private String lastName;
+
+    @Column(length = 50, unique = true)
+    private String userName;
+
+    @Column(length = 50, unique = true)
+    private String email;
+
+    @Column(length = 50)
+    private String password;
+
+    @Column(length = 50)
+    private String bio;
+
+    // 🛡️ User Role (Admin / User) — Enum Stored as String
+    @Enumerated(EnumType.STRING)
+    private RoleEnum role;
 
     @Temporal(TemporalType.DATE)
     private Date birthdate;
-	
+
+    // 🔗 1️⃣ User ↔ Memberships (Many Groups)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<GroupMembership> memberships;
+
+    // 👑 2️⃣ User ↔ Admin of Groups (Many Admins per Group)
+    @ManyToMany(mappedBy = "groupAdmins")
+    private Set<Group> adminOfGroups;
+
+    // ❤️ 3️⃣ User ↔ Likes (A user can like many posts)
     @OneToMany(mappedBy = "user")
     private Set<Like> listOfLikedPosts;
-	
+
+    // 💬 4️⃣ User ↔ Comments (User can create many comments)
     @OneToMany(mappedBy = "creator")
     private Set<Comment> commentsList;
-	
-	@OneToMany(mappedBy = "user")
-	private Set<GroupPost> groupPosts;
 
-	@OneToMany(mappedBy = "user")
-	private Set<UserPost> userPosts;
-	
-	@OneToMany(mappedBy = "user")
-    private Set<Friendships> friendships; // U1 <-> U2
-	
-	@OneToMany(mappedBy = "requester")
-	private Set<FriendshipRequests> sentRequests;  // U1 -> U2
+    // 🏘️ 5️⃣ User ↔ GroupPosts (User posts in groups)
+    @OneToMany(mappedBy = "user")
+    private Set<GroupPost> groupPosts;
 
-	@OneToMany(mappedBy = "receiver")
-	private Set<FriendshipRequests> receivedRequests; // U2 <- U1
-	
-	public Set<Friendships> getFriendships() {
-		return friendships;
-	}
+    // 🏠 6️⃣ User ↔ UserPosts (User posts on own timeline)
+    @OneToMany(mappedBy = "user")
+    private Set<UserPost> userPosts;
 
-	public void setFriendships(Set<Friendships> friendships) {
-		this.friendships = friendships;
-	}
+    // 👫 7️⃣ User ↔ Friendships (Confirmed friends)
+    @OneToMany(mappedBy = "user")
+    private Set<Friendships> friendships;
 
-	public Set<FriendshipRequests> getSentRequests() {
-		return sentRequests;
-	}
+    // 📨 8️⃣ Sent Friend Requests (User is requester)
+    @OneToMany(mappedBy = "requester")
+    private Set<FriendshipRequests> sentRequests;
 
-	public void setSentRequests(Set<FriendshipRequests> sentRequests) {
-		this.sentRequests = sentRequests;
-	}
+    // 📥 9️⃣ Received Friend Requests (User is receiver)
+    @OneToMany(mappedBy = "receiver")
+    private Set<FriendshipRequests> receivedRequests;
 
-	public Set<FriendshipRequests> getReceivedRequests() {
-		return receivedRequests;
-	}
+    // ✅ All Getters & Setters...
 
-	public void setReceivedRequests(Set<FriendshipRequests> receivedRequests) {
-		this.receivedRequests = receivedRequests;
-	}
-
+    
 	public Long getUserId() {
-    return userId;
+		return userId;
 	}
 
 	public void setUserId(Long userId) {
@@ -155,6 +161,37 @@ public class User {
 		this.role = role;
 	}
 
+	public Date getBirthdate() {
+		return birthdate;
+	}
+
+	public void setBirthdate(Date birthdate) {
+		this.birthdate = birthdate;
+	}
+
+	public Set<GroupMembership> getMemberships() {
+		return memberships;
+	}
+
+	public void setMemberships(Set<GroupMembership> memberships) {
+		this.memberships = memberships;
+	}
+
+	public Set<Group> getAdminOfGroups() {
+		return adminOfGroups;
+	}
+
+	public void setAdminOfGroups(Set<Group> adminOfGroups) {
+		this.adminOfGroups = adminOfGroups;
+	}
+
+	public Set<Like> getListOfLikedPosts() {
+		return listOfLikedPosts;
+	}
+
+	public void setListOfLikedPosts(Set<Like> listOfLikedPosts) {
+		this.listOfLikedPosts = listOfLikedPosts;
+	}
 
 	public Set<Comment> getCommentsList() {
 		return commentsList;
@@ -180,6 +217,30 @@ public class User {
 		this.userPosts = userPosts;
 	}
 
+	public Set<Friendships> getFriendships() {
+		return friendships;
+	}
+
+	public void setFriendships(Set<Friendships> friendships) {
+		this.friendships = friendships;
+	}
+
+	public Set<FriendshipRequests> getSentRequests() {
+		return sentRequests;
+	}
+
+	public void setSentRequests(Set<FriendshipRequests> sentRequests) {
+		this.sentRequests = sentRequests;
+	}
+
+	public Set<FriendshipRequests> getReceivedRequests() {
+		return receivedRequests;
+	}
+
+	public void setReceivedRequests(Set<FriendshipRequests> receivedRequests) {
+		this.receivedRequests = receivedRequests;
+	}
+	
 	
 	@Override
 	public String toString() {
