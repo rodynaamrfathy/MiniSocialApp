@@ -9,7 +9,10 @@ import service.UserService;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Path("/friendships")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -108,4 +111,56 @@ public class FriendshipResource {
 
         return Response.ok(request).build();
     }
+    
+    // get all friends and return them in json format 
+    @GET
+    @Path("/{userId}/friends")
+    public Response getAllFriends(@PathParam("userId") Long userId) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                           .entity("User not found.")
+                           .build();
+        }
+
+        List<User> friends = friendshipService.getAllFriendsOfUser(user);
+        List<Map<String, Object>> friendInfos = friends.stream().map(friend -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", friend.getUserId());
+            map.put("firstName", friend.getFirstName());
+            map.put("lastName", friend.getLastName());
+            map.put("bio", friend.getBio());
+            map.put("birthdate", friend.getBirthdate());
+            return map;
+        }).toList();
+
+        return Response.ok(friendInfos).build();
+    }
+
+
+    
+    // view friend profile by id
+    // take user id to make sure they are friends before {userId} before sending to them thier id
+    //    @Path("/friendProfile/{userId}/{friendId}")
+
+    @GET
+    @Path("/friendProfile/{friendId}")
+    public Response getFriendProfile(@PathParam("friendId") Long friendId) {
+        User friend = userService.getUserById(friendId);
+        if (friend == null) {
+            return Response.status(Response.Status.NOT_FOUND)
+                           .entity("Friend not found.")
+                           .build();
+        }
+
+        Map<String, Object> friendInfo = new HashMap<>();
+        friendInfo.put("id", friend.getUserId());
+        friendInfo.put("firstName", friend.getFirstName());
+        friendInfo.put("lastName", friend.getLastName());
+        friendInfo.put("bio", friend.getBio());
+        friendInfo.put("birthdate", friend.getBirthdate());
+
+        return Response.ok(friendInfo).build();
+    }
+
 }
