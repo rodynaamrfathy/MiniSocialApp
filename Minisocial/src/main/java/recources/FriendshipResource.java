@@ -36,6 +36,13 @@ public class FriendshipResource {
             return Response.status(Response.Status.NOT_FOUND).entity("User not found.").build();
         }
 
+        // 👤❌ Self-request validation
+        if (requester.getUserId().equals(receiver.getUserId())) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity("❌ You can't send a friend request to yourself.")
+                           .build();
+        }
+
         boolean success = friendshipService.sendFriendRequest(requester, receiver);
         if (!success) {
             return Response.status(Response.Status.BAD_REQUEST)
@@ -47,6 +54,7 @@ public class FriendshipResource {
                        .entity("Friend request sent successfully.")
                        .build();
     }
+
 
     @POST
     @Path("/accept/{requestId}")
