@@ -43,7 +43,7 @@ public class UserResource {
     public Response manageProfile(User user) {
         try {
             userService.manageProfile(user);
-            return Response.ok().build();
+            return Response.ok("Updated Profile").build();
         } catch (WebApplicationException e) {
             return Response.status(e.getResponse().getStatus()).entity(e.getMessage()).build();
         } catch (Exception e) {

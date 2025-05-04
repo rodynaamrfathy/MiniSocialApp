@@ -36,6 +36,7 @@ public class UserService {
         existingUserToUpdate.setPassword(user.getPassword());
     }
 
+    
     // User login - returns boolean without exceptions
     public boolean login(String userName, String password) {
         TypedQuery<User> query = em.createQuery(

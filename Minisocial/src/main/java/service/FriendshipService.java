@@ -38,9 +38,7 @@ public class FriendshipService {
     public boolean acceptFriendRequest(FriendshipRequests request) {
         if (request.getStatus() == FriendshipStatus.PENDING) {
             request.setStatus(FriendshipStatus.ACCEPTED);
-
             createMutualFriendship(request.getRequester(), request.getReceiver());
-
             em.merge(request);
             return true;
         }
@@ -78,13 +76,9 @@ public class FriendshipService {
         return em.find(FriendshipRequests.class, requestId);
     }
 
+    // ✅ Updated to use em.find instead of JPQL
     public String getRequestStringById(int requestId) {
-        FriendshipRequests request = em.createQuery(
-                "SELECT r FROM FriendshipRequests r WHERE r.friendship_request_id = :requestId",
-                FriendshipRequests.class)
-                .setParameter("requestId", requestId)
-                .getSingleResult();
-
+        FriendshipRequests request = em.find(FriendshipRequests.class, requestId);
         return request != null ? request.toString() : "FriendshipRequest not found";
     }
 
