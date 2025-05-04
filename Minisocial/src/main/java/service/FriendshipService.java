@@ -20,6 +20,12 @@ public class FriendshipService {
 
     // Send Friend Request
     public boolean sendFriendRequest(User requester, User receiver) {
+        // ❌ Cannot send request to oneself
+        if (requester.getUserId().equals(receiver.getUserId())) {
+            System.out.println("You can't send a friend request to yourself.");
+            return false;
+        }
+
         if (isAlreadyFriends(requester, receiver) || hasPendingRequest(requester, receiver)) {
             return false;
         }
@@ -33,6 +39,7 @@ public class FriendshipService {
         em.persist(request);
         return true;
     }
+
 
     // Accept Friend Request
     public boolean acceptFriendRequest(FriendshipRequests request) {

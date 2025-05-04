@@ -11,6 +11,7 @@ encoding//src/main/java/models/Post.java=UTF-8
 encoding//src/main/java/models/Test.java=UTF-8
 encoding//src/main/java/models/User.java=UTF-8
 encoding//src/main/java/models/UserPost.java=UTF-8
+encoding//src/main/java/recources/FriendshipResource.java=UTF-8
 encoding//src/main/java/recources/TestResource.java=UTF-8
 encoding//src/main/java/recources/UserResource.java=UTF-8
 encoding//src/main/java/service/FriendshipService.java=UTF-8
