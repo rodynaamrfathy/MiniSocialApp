@@ -1,7 +1,6 @@
 package models;
 
 import javax.persistence.*;
-
 import java.util.Date; 
 
 /**
@@ -17,7 +16,6 @@ import java.util.Date;
 
 @Entity
 public class Friendships {
-  
 
     // 🔑 Primary Key
     @Id
@@ -38,39 +36,57 @@ public class Friendships {
     @Temporal(TemporalType.DATE)
     private Date since;
 
-    
+    // ✅ Constructor
     public Friendships() {}
-    
+
     public int getFriendshipId() {
-		return friendship_id;
-	}
+        return friendship_id;
+    }
 
-	public void setFriendshipId(int friendship_id) {
-		this.friendship_id = friendship_id;
-	}
-	
-	public User getUser() {
-		return user;
-	}
-	
-	public void setUser(User user) {
-		this.user = user;
-	}
-	
-	public User getFriend() {
-		return friend;
-	}
-	
-	public void setFriend(User friend) {
-		this.friend = friend;
-	}
-	
-	public Date getSince() {
-		return since;
-	}
+    public int getFriendship_id() {
+        return friendship_id;
+    }
 
-	public void setSince(Date since) {
-		this.since = since;
-	}
+    public void setFriendship_id(int friendship_id) {
+        this.friendship_id = friendship_id;
+    }
+
+    public void setFriendshipId(int friendship_id) {
+        this.friendship_id = friendship_id;
+    }
     
+    public User getUser() {
+        return user;
+    }
+    
+    public void setUser(User user) {
+        this.user = user;
+    }
+    
+    public User getFriend() {
+        return friend;
+    }
+    
+    public void setFriend(User friend) {
+        this.friend = friend;
+    }
+    
+    public Date getSince() {
+        return since;
+    }
+
+    public void setSince(Date since) {
+        this.since = since;
+    }
+
+    // 📝 toString() method for a readable string representation of the Friendships entity
+    @Override
+    public String toString() {
+        return "Friendships{" +
+               "friendship_id=" + friendship_id +
+               ", user=" + (user != null ? user.getUserName() : "null") +
+               ", friend=" + (friend != null ? friend.getUserName() : "null") +
+               ", since=" + since +
+               '}';
+    }
 }

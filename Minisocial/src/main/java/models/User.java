@@ -5,6 +5,7 @@ import java.util.Set;
 import javax.persistence.*;
 import enums.RoleEnum;
 
+
 /**
  * 🧑‍💼 User Entity – Relationships Summary 🍙
  * 
@@ -39,10 +40,10 @@ public class User {
     @Column(length = 50)
     private String lastName;
 
-    @Column(length = 50, unique = true)
+    @Column(length = 50)
     private String userName;
 
-    @Column(length = 50, unique = true)
+    @Column(length = 50, unique = true, nullable = false)
     private String email;
 
     @Column(length = 50)
@@ -55,11 +56,12 @@ public class User {
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
 
+    
     @Temporal(TemporalType.DATE)
     private Date birthdate;
 
     // 🔗 1️⃣ User ↔ Memberships (Many Groups)
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     private Set<GroupMembership> memberships;
 
     // 👑 2️⃣ User ↔ Admin of Groups (Many Admins per Group)

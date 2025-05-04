@@ -1,9 +1,7 @@
 package models;
 
 import javax.persistence.*;
-
 import java.util.Date;
-
 import enums.FriendshipStatus;
 
 /**
@@ -52,7 +50,7 @@ public class FriendshipRequests {
         return friendship_request_id;
     }
     
-    public void getFriendshipRequestId(int friendship_request_id) {
+    public void setFriendshipRequestId(int friendship_request_id) {
         this.friendship_request_id = friendship_request_id;
     }
 
@@ -81,11 +79,22 @@ public class FriendshipRequests {
     }
     
     public Date getTimeStamp() {
-		return timestamp;
-	}
+        return timestamp;
+    }
 
-	public void setTimeStamp(Date timestamp) {
-		this.timestamp = timestamp;
-	}
+    public void setTimeStamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    // 📝 toString() method for a readable string representation of the FriendshipRequests entity
+    @Override
+    public String toString() {
+        return "FriendshipRequests{" +
+               "friendship_request_id=" + friendship_request_id +
+               ", requester=" + (requester != null ? requester.getUserName() : "null") +
+               ", receiver=" + (receiver != null ? receiver.getUserName() : "null") +
+               ", status=" + status +
+               ", timestamp=" + timestamp +
+               '}';
+    }
 }
-
