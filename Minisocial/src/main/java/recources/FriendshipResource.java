@@ -139,17 +139,24 @@ public class FriendshipResource {
 
 
     
-    // view friend profile by id
-    // take user id to make sure they are friends before {userId} before sending to them thier id
-    //    @Path("/friendProfile/{userId}/{friendId}")
-
     @GET
-    @Path("/friendProfile/{friendId}")
-    public Response getFriendProfile(@PathParam("friendId") Long friendId) {
+    @Path("/friendProfile/{userId}/{friendId}")
+    public Response getFriendProfile(
+        @PathParam("userId") Long userId,
+        @PathParam("friendId") Long friendId
+    ) {
+        User user = userService.getUserById(userId);
         User friend = userService.getUserById(friendId);
-        if (friend == null) {
+
+        if (user == null || friend == null) {
             return Response.status(Response.Status.NOT_FOUND)
-                           .entity("Friend not found.")
+                           .entity("User or friend not found.")
+                           .build();
+        }
+
+        if (!friendshipService.isAlreadyFriends(user, friend)) {
+            return Response.status(Response.Status.FORBIDDEN)
+                           .entity("You are not friends with this user.")
                            .build();
         }
 
@@ -162,5 +169,6 @@ public class FriendshipResource {
 
         return Response.ok(friendInfo).build();
     }
+
 
 }

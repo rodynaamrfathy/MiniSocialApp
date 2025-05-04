@@ -90,7 +90,7 @@ public class FriendshipService {
 
     // ========== Internal Helpers ==========
 
-    private boolean isAlreadyFriends(User user1, User user2) {
+    public boolean isAlreadyFriends(User user1, User user2) {
         Long count = em.createQuery(
             "SELECT COUNT(f) FROM Friendships f WHERE " +
             "(f.user = :user1 AND f.friend = :user2) OR (f.user = :user2 AND f.friend = :user1)",
