@@ -2,11 +2,10 @@ package service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 import javax.ejb.Stateless;
 import javax.persistence.*;
 import javax.ws.rs.WebApplicationException;
-
+import Utils.UserUtils;
 import models.User;
 
 @Stateless
@@ -15,7 +14,11 @@ public class UserService {
     @PersistenceContext(unitName = "hello")
     private EntityManager em;
 
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^.+@.+\\..+$");
+    // Register User
+    public User register(User user) {
+        em.persist(user);
+        return user;
+    }
 
     // Manage or update user profile
     public void manageProfile(User user) {
@@ -33,66 +36,40 @@ public class UserService {
         existingUserToUpdate.setPassword(user.getPassword());
     }
 
-    // User login
-    public User login(String userName, String password) {
+    // User login - returns boolean without exceptions
+    public boolean login(String userName, String password) {
         TypedQuery<User> query = em.createQuery(
-            "SELECT u FROM User u WHERE u.userName = :userName AND u.password = :password", User.class);
+            UserUtils.LOGIN_QUERY, User.class);
         query.setParameter("userName", userName);
         query.setParameter("password", password);
-        try {
-            return query.getSingleResult();
-        } catch (Exception e) {
-            return null;
-        }
+
+        List<User> users = query.getResultList();
+        return !users.isEmpty(); // Return true if user is found
     }
 
     // Validate user input
     public List<String> validateUser(User user) {
-        List<String> errors = new ArrayList<>();
-
-        if (user.getEmail() == null || !EMAIL_PATTERN.matcher(user.getEmail()).matches()) {
-            errors.add("Invalid email format");
-        }
-
-        if (user.getPassword() == null || user.getPassword().length() < 8) {
-            errors.add("Password must be at least 8 characters long");
-        }
-
-        if (!errors.contains("Invalid email format") && isEmailTaken(user.getEmail())) {
-            errors.add("Email is already in use");
-        }
-
-        return errors;
-    }
-
-    // Save new user
-    public User saveUser(User user) {
-        em.persist(user);
-        return user;
-    }
-
-    private boolean isEmailTaken(String email) {
-        long count = em.createQuery(
-            "SELECT COUNT(u) FROM User u WHERE u.email = :email", Long.class)
-            .setParameter("email", email)
-            .getSingleResult();
-        return count > 0;
+        // Delegate to UserUtils for validation
+        return UserUtils.validateUser(user, em);
     }
 
     // Get user by ID
     public User getUserById(Long userId) {
-        return em.find(User.class, userId);
+        TypedQuery<User> query = em.createQuery(
+            UserUtils.GET_USER_BY_ID_QUERY, User.class);
+        query.setParameter("userId", userId);
+        List<User> users = query.getResultList();
+
+        return users.isEmpty() ? null : users.get(0);
     }
 
     // Get user string representation by ID
     public List<String> getUserStringById(Long userId) {
-        List<User> users = em.createQuery("SELECT u FROM User u WHERE u.id = :userId", User.class)
-                              .setParameter("userId", userId)
-                              .getResultList();
+        User user = getUserById(userId);
 
         List<String> userStrings = new ArrayList<>();
-        if (!users.isEmpty()) {
-            userStrings.add(users.get(0).toString());
+        if (user != null && user.getUserId() != null) {
+            userStrings.add(user.toString());
         } else {
             userStrings.add("User not found");
         }
@@ -102,7 +79,9 @@ public class UserService {
 
     // Get all users (string representations)
     public List<String> getAllUsers() {
-        List<User> users = em.createQuery("SELECT u FROM User u", User.class).getResultList();
+        TypedQuery<User> query = em.createQuery(
+            UserUtils.GET_ALL_USERS_QUERY, User.class);
+        List<User> users = query.getResultList();
         List<String> userStrings = new ArrayList<>();
 
         for (User user : users) {

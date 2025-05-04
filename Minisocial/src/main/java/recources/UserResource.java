@@ -31,7 +31,7 @@ public class UserResource {
                            .build();
         }
 
-        User createdUser = userService.saveUser(user);
+        User createdUser = userService.register(user);
 
         return Response.status(Response.Status.CREATED)
                        .entity(createdUser)
@@ -59,15 +59,19 @@ public class UserResource {
         String userName = loginUser.getUserName();
         String password = loginUser.getPassword();
 
-        User user = userService.login(userName, password);
-        if (user != null) {
-            return Response.ok("Login successful").build();
+        boolean isLoggedIn = userService.login(userName, password);
+        if (isLoggedIn) {
+            // Log the successful login
+            System.out.println(userName + " is logged in");
+            return Response.ok(userName + " login successful").build();
         } else {
             return Response.status(Response.Status.UNAUTHORIZED)
                            .entity("Invalid username or password")
                            .build();
         }
     }
+
+
 
     @GET
     @Path("/allUsers")
