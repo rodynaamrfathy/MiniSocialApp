@@ -2,15 +2,15 @@ package service;
 
 import enums.FriendshipStatus;
 import models.FriendshipRequests;
-import models.Friendships;
 import models.User;
+import Utils.FriendshipUtils;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 @Stateless
 public class FriendshipService {
@@ -18,41 +18,20 @@ public class FriendshipService {
     @PersistenceContext(unitName = "hello")
     private EntityManager em;
 
-    // Send Friend Request
     public boolean sendFriendRequest(User requester, User receiver) {
-        // ❌ Cannot send request to oneself
-        if (requester.getUserId().equals(receiver.getUserId())) {
-            System.out.println("You can't send a friend request to yourself.");
-            return false;
-        }
-
-        if (isAlreadyFriends(requester, receiver) || hasPendingRequest(requester, receiver)) {
-            return false;
-        }
-
-        FriendshipRequests request = new FriendshipRequests();
-        request.setRequester(requester);
-        request.setReceiver(receiver);
-        request.setStatus(FriendshipStatus.PENDING);
-        request.setTimeStamp(new Date());
-
-        em.persist(request);
-        return true;
+        return FriendshipUtils.sendFriendRequest(em, requester, receiver);
     }
 
-
-    // Accept Friend Request
     public boolean acceptFriendRequest(FriendshipRequests request) {
         if (request.getStatus() == FriendshipStatus.PENDING) {
             request.setStatus(FriendshipStatus.ACCEPTED);
-            createMutualFriendship(request.getRequester(), request.getReceiver());
+            FriendshipUtils.createMutualFriendship(em, request.getRequester(), request.getReceiver());
             em.merge(request);
             return true;
         }
         return false;
     }
 
-    // Reject Friend Request
     public boolean rejectFriendRequest(FriendshipRequests request) {
         if (request.getStatus() == FriendshipStatus.PENDING) {
             request.setStatus(FriendshipStatus.REJECTED);
@@ -62,78 +41,55 @@ public class FriendshipService {
         return false;
     }
 
-    // Get all pending friendship requests for a user
     public List<String> getAllPendingRequests(Long userId) {
-        List<FriendshipRequests> requests = em.createQuery(
-            "SELECT r FROM FriendshipRequests r WHERE r.receiver.id = :userId AND r.status = :status",
-            FriendshipRequests.class)
-            .setParameter("userId", userId)
-            .setParameter("status", FriendshipStatus.PENDING)
-            .getResultList();
-
-        List<String> result = new ArrayList<>();
-        for (FriendshipRequests request : requests) {
-            result.add(request.toString());
-        }
-        return result;
+        return FriendshipUtils.getAllPendingRequests(em, userId);
     }
 
-    // Get request by ID
     public FriendshipRequests getRequestById(int requestId) {
         return em.find(FriendshipRequests.class, requestId);
     }
 
-    // ✅ Updated to use em.find instead of JPQL
     public String getRequestStringById(int requestId) {
         FriendshipRequests request = em.find(FriendshipRequests.class, requestId);
         return request != null ? request.toString() : "FriendshipRequest not found";
     }
 
-    // ========== Internal Helpers ==========
-
-    public boolean isAlreadyFriends(User user1, User user2) {
-        Long count = em.createQuery(
-            "SELECT COUNT(f) FROM Friendships f WHERE " +
-            "(f.user = :user1 AND f.friend = :user2) OR (f.user = :user2 AND f.friend = :user1)",
-            Long.class)
-            .setParameter("user1", user1)
-            .setParameter("user2", user2)
-            .getSingleResult();
-        return count > 0;
+    public boolean isAlreadyFriends(User u1, User u2) {
+        return FriendshipUtils.isAlreadyFriends(em, u1, u2);
     }
 
-    private boolean hasPendingRequest(User requester, User receiver) {
-        Long count = em.createQuery(
-            "SELECT COUNT(r) FROM FriendshipRequests r WHERE " +
-            "r.requester = :requester AND r.receiver = :receiver AND r.status = :status",
-            Long.class)
-            .setParameter("requester", requester)
-            .setParameter("receiver", receiver)
-            .setParameter("status", FriendshipStatus.PENDING)
-            .getSingleResult();
-        return count > 0;
+    public boolean isSelfRequest(User requester, User receiver) {
+        return requester.getUserId().equals(receiver.getUserId());
     }
 
-    private void createMutualFriendship(User user1, User user2) {
-        Friendships f1 = new Friendships();
-        f1.setUser(user1);
-        f1.setFriend(user2);
-        f1.setSince(new Date());
-        em.persist(f1);
-
-        Friendships f2 = new Friendships();
-        f2.setUser(user2);
-        f2.setFriend(user1);
-        f2.setSince(new Date());
-        em.persist(f2);
+    public boolean isSelfProfile(Long userId, Long friendId) {
+        return userId.equals(friendId);
     }
 
     public List<User> getAllFriendsOfUser(User user) {
-        return em.createQuery(
-            "SELECT f.friend FROM Friendships f WHERE f.user = :user", User.class)
-            .setParameter("user", user)
-            .getResultList();
+        return FriendshipUtils.getAllFriendsOfUser(em, user);
     }
 
+    public List<Map<String, Object>> mapFriendInfos(List<User> friends) {
+        List<Map<String, Object>> friendInfos = friends.stream().map(friend -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", friend.getUserId());
+            map.put("firstName", friend.getFirstName());
+            map.put("lastName", friend.getLastName());
+            map.put("bio", friend.getBio());
+            map.put("birthdate", friend.getBirthdate());
+            return map;
+        }).toList();
+        return friendInfos;
+    }
 
+    public Map<String, Object> mapFriendInfo(User friend) {
+        Map<String, Object> friendInfo = new HashMap<>();
+        friendInfo.put("id", friend.getUserId());
+        friendInfo.put("firstName", friend.getFirstName());
+        friendInfo.put("lastName", friend.getLastName());
+        friendInfo.put("bio", friend.getBio());
+        friendInfo.put("birthdate", friend.getBirthdate());
+        return friendInfo;
+    }
 }

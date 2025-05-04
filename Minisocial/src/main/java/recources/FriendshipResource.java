@@ -5,12 +5,9 @@ import models.FriendshipRequests;
 import models.User;
 import service.FriendshipService;
 import service.UserService;
-
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
-
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,8 +33,8 @@ public class FriendshipResource {
             return Response.status(Response.Status.NOT_FOUND).entity("User not found.").build();
         }
 
-        // 👤❌ Self-request validation
-        if (requester.getUserId().equals(receiver.getUserId())) {
+        // Check for self-request and existing requests
+        if (friendshipService.isSelfRequest(requester, receiver)) {
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity("❌ You can't send a friend request to yourself.")
                            .build();
@@ -54,7 +51,6 @@ public class FriendshipResource {
                        .entity("Friend request sent successfully.")
                        .build();
     }
-
 
     @POST
     @Path("/accept/{requestId}")
@@ -119,8 +115,7 @@ public class FriendshipResource {
 
         return Response.ok(request).build();
     }
-    
-    // get all friends and return them in json format 
+
     @GET
     @Path("/{userId}/friends")
     public Response getAllFriends(@PathParam("userId") Long userId) {
@@ -132,29 +127,23 @@ public class FriendshipResource {
         }
 
         List<User> friends = friendshipService.getAllFriendsOfUser(user);
-        List<Map<String, Object>> friendInfos = friends.stream().map(friend -> {
-            Map<String, Object> map = new HashMap<>();
-            map.put("id", friend.getUserId());
-            map.put("firstName", friend.getFirstName());
-            map.put("lastName", friend.getLastName());
-            map.put("bio", friend.getBio());
-            map.put("birthdate", friend.getBirthdate());
-            return map;
-        }).toList();
+        List<Map<String, Object>> friendInfos = friendshipService.mapFriendInfos(friends);
 
         return Response.ok(friendInfos).build();
     }
 
-
-    
     @GET
     @Path("/friendProfile/{userId}/{friendId}")
-    public Response getFriendProfile(
-        @PathParam("userId") Long userId,
-        @PathParam("friendId") Long friendId
-    ) {
+    public Response getFriendProfile(@PathParam("userId") Long userId,
+                                     @PathParam("friendId") Long friendId) {
         User user = userService.getUserById(userId);
         User friend = userService.getUserById(friendId);
+
+        if (friendshipService.isSelfProfile(userId, friendId)) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity("You can't view your own profile through this endpoint.")
+                           .build();
+        }
 
         if (user == null || friend == null) {
             return Response.status(Response.Status.NOT_FOUND)
@@ -168,15 +157,7 @@ public class FriendshipResource {
                            .build();
         }
 
-        Map<String, Object> friendInfo = new HashMap<>();
-        friendInfo.put("id", friend.getUserId());
-        friendInfo.put("firstName", friend.getFirstName());
-        friendInfo.put("lastName", friend.getLastName());
-        friendInfo.put("bio", friend.getBio());
-        friendInfo.put("birthdate", friend.getBirthdate());
-
+        Map<String, Object> friendInfo = friendshipService.mapFriendInfo(friend);
         return Response.ok(friendInfo).build();
     }
-
-
 }

@@ -1,5 +1,96 @@
 package Utils;
 
+import enums.FriendshipStatus;
+import models.FriendshipRequests;
+import models.Friendships;
+import models.User;
+
+import javax.persistence.EntityManager;
+import java.util.Date;
+import java.util.List;
+
 public class FriendshipUtils {
 
+    // ===================== 📜 JPQL Queries =====================
+    public static final String GET_PENDING_REQUESTS_QUERY =
+            "SELECT r FROM FriendshipRequests r WHERE r.receiver.id = :userId AND r.status = :status";
+
+    public static final String IS_ALREADY_FRIENDS_QUERY =
+            "SELECT COUNT(f) FROM Friendships f WHERE " +
+            "(f.user = :user1 AND f.friend = :user2) OR (f.user = :user2 AND f.friend = :user1)";
+
+    public static final String HAS_PENDING_REQUEST_QUERY =
+            "SELECT COUNT(r) FROM FriendshipRequests r WHERE " +
+            "r.requester = :requester AND r.receiver = :receiver AND r.status = :status";
+
+    public static final String GET_ALL_FRIENDS_QUERY =
+            "SELECT f.friend FROM Friendships f WHERE f.user = :user";
+
+    // ===================== 🤝 Utility Logic =====================
+
+    public static boolean sendFriendRequest(EntityManager em, User requester, User receiver) {
+        if (requester.getUserId().equals(receiver.getUserId())) {
+            System.out.println("❌ You can't send a friend request to yourself.");
+            return false;
+        }
+
+        if (isAlreadyFriends(em, requester, receiver) || hasPendingRequest(em, requester, receiver)) {
+            return false;
+        }
+
+        FriendshipRequests request = new FriendshipRequests();
+        request.setRequester(requester);
+        request.setReceiver(receiver);
+        request.setStatus(FriendshipStatus.PENDING);
+        request.setTimeStamp(new Date());
+
+        em.persist(request);
+        return true;
+    }
+
+    public static boolean isAlreadyFriends(EntityManager em, User user1, User user2) {
+        Long count = em.createQuery(IS_ALREADY_FRIENDS_QUERY, Long.class)
+                .setParameter("user1", user1)
+                .setParameter("user2", user2)
+                .getSingleResult();
+        return count > 0;
+    }
+
+    public static boolean hasPendingRequest(EntityManager em, User requester, User receiver) {
+        Long count = em.createQuery(HAS_PENDING_REQUEST_QUERY, Long.class)
+                .setParameter("requester", requester)
+                .setParameter("receiver", receiver)
+                .setParameter("status", FriendshipStatus.PENDING)
+                .getSingleResult();
+        return count > 0;
+    }
+
+    public static void createMutualFriendship(EntityManager em, User user1, User user2) {
+        Friendships f1 = new Friendships();
+        f1.setUser(user1);
+        f1.setFriend(user2);
+        f1.setSince(new Date());
+        em.persist(f1);
+
+        Friendships f2 = new Friendships();
+        f2.setUser(user2);
+        f2.setFriend(user1);
+        f2.setSince(new Date());
+        em.persist(f2);
+    }
+
+    public static List<String> getAllPendingRequests(EntityManager em, Long userId) {
+        List<FriendshipRequests> requests = em.createQuery(GET_PENDING_REQUESTS_QUERY, FriendshipRequests.class)
+                .setParameter("userId", userId)
+                .setParameter("status", FriendshipStatus.PENDING)
+                .getResultList();
+
+        return requests.stream().map(FriendshipRequests::toString).toList();
+    }
+
+    public static List<User> getAllFriendsOfUser(EntityManager em, User user) {
+        return em.createQuery(GET_ALL_FRIENDS_QUERY, User.class)
+                .setParameter("user", user)
+                .getResultList();
+    }
 }
