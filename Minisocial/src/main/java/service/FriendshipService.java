@@ -120,4 +120,13 @@ public class FriendshipService {
         f2.setSince(new Date());
         em.persist(f2);
     }
+
+    public List<User> getAllFriendsOfUser(User user) {
+        return em.createQuery(
+            "SELECT f.friend FROM Friendships f WHERE f.user = :user", User.class)
+            .setParameter("user", user)
+            .getResultList();
+    }
+
+
 }
