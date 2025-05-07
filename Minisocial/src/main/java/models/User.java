@@ -1,10 +1,9 @@
 package models;
 
+import javax.persistence.*;
 import java.util.Date;
 import java.util.Set;
-import javax.persistence.*;
 import enums.RoleEnum;
-
 
 /**
  * 🧑‍💼 User Entity – Relationships Summary 🍙
@@ -23,7 +22,6 @@ import enums.RoleEnum;
  *   -->  One-to-Many (1:N)
  *   <--> Many-to-Many (M:N)
  */
-
 
 @Entity
 public class User {
@@ -56,207 +54,204 @@ public class User {
     @Enumerated(EnumType.STRING)
     private RoleEnum role;
 
-    
     @Temporal(TemporalType.DATE)
     private Date birthdate;
 
     // 🔗 1️⃣ User ↔ Memberships (Many Groups)
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<GroupMembership> memberships;
 
     // 👑 2️⃣ User ↔ Admin of Groups (Many Admins per Group)
-    @ManyToMany(mappedBy = "groupAdmins")
+    @ManyToMany(mappedBy = "groupAdmins", fetch = FetchType.LAZY)
     private Set<Group> adminOfGroups;
 
     // ❤️ 3️⃣ User ↔ Likes (A user can like many posts)
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Like> listOfLikedPosts;
 
     // 💬 4️⃣ User ↔ Comments (User can create many comments)
-    @OneToMany(mappedBy = "creator")
+    @OneToMany(mappedBy = "creator", fetch = FetchType.LAZY)
     private Set<Comment> commentsList;
 
     // 🏘️ 5️⃣ User ↔ GroupPosts (User posts in groups)
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<GroupPost> groupPosts;
 
     // 🏠 6️⃣ User ↔ UserPosts (User posts on own timeline)
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<UserPost> userPosts;
 
     // 👫 7️⃣ User ↔ Friendships (Confirmed friends)
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     private Set<Friendships> friendships;
 
     // 📨 8️⃣ Sent Friend Requests (User is requester)
-    @OneToMany(mappedBy = "requester")
+    @OneToMany(mappedBy = "requester", fetch = FetchType.LAZY)
     private Set<FriendshipRequests> sentRequests;
 
     // 📥 9️⃣ Received Friend Requests (User is receiver)
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
     private Set<FriendshipRequests> receivedRequests;
 
     // ✅ All Getters & Setters...
 
-    
-	public Long getUserId() {
-		return userId;
-	}
+    // Ensure no circular references in toString()
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", userName='" + userName + '\'' +
+                ", email='" + email + '\'' +
+                ", bio='" + bio + '\'' +
+                ", role='" + role + '\'' +
+                '}';
+    }
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
+    // Getters and setters (same as your original ones)
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public Long getUserId() {
+        return userId;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	public String getUserName() {
-		return userName;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public String getUserName() {
+        return userName;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getEmail() {
+        return email;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setEmail(String email) {
+        this.email = email;
+    }
 
-	public String getBio() {
-		return bio;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setBio(String bio) {
-		this.bio = bio;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
-	public RoleEnum getRole() {
-		return role;
-	}
+    public String getBio() {
+        return bio;
+    }
 
-	public void setRole(RoleEnum role) {
-		this.role = role;
-	}
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
 
-	public Date getBirthdate() {
-		return birthdate;
-	}
+    public RoleEnum getRole() {
+        return role;
+    }
 
-	public void setBirthdate(Date birthdate) {
-		this.birthdate = birthdate;
-	}
+    public void setRole(RoleEnum role) {
+        this.role = role;
+    }
 
-	public Set<GroupMembership> getMemberships() {
-		return memberships;
-	}
+    public Date getBirthdate() {
+        return birthdate;
+    }
 
-	public void setMemberships(Set<GroupMembership> memberships) {
-		this.memberships = memberships;
-	}
+    public void setBirthdate(Date birthdate) {
+        this.birthdate = birthdate;
+    }
 
-	public Set<Group> getAdminOfGroups() {
-		return adminOfGroups;
-	}
+    public Set<GroupMembership> getMemberships() {
+        return memberships;
+    }
 
-	public void setAdminOfGroups(Set<Group> adminOfGroups) {
-		this.adminOfGroups = adminOfGroups;
-	}
+    public void setMemberships(Set<GroupMembership> memberships) {
+        this.memberships = memberships;
+    }
 
-	public Set<Like> getListOfLikedPosts() {
-		return listOfLikedPosts;
-	}
+    public Set<Group> getAdminOfGroups() {
+        return adminOfGroups;
+    }
 
-	public void setListOfLikedPosts(Set<Like> listOfLikedPosts) {
-		this.listOfLikedPosts = listOfLikedPosts;
-	}
+    public void setAdminOfGroups(Set<Group> adminOfGroups) {
+        this.adminOfGroups = adminOfGroups;
+    }
 
-	public Set<Comment> getCommentsList() {
-		return commentsList;
-	}
+    public Set<Like> getListOfLikedPosts() {
+        return listOfLikedPosts;
+    }
 
-	public void setCommentsList(Set<Comment> commentsList) {
-		this.commentsList = commentsList;
-	}
+    public void setListOfLikedPosts(Set<Like> listOfLikedPosts) {
+        this.listOfLikedPosts = listOfLikedPosts;
+    }
 
-	public Set<GroupPost> getGroupPosts() {
-		return groupPosts;
-	}
+    public Set<Comment> getCommentsList() {
+        return commentsList;
+    }
 
-	public void setGroupPosts(Set<GroupPost> groupPosts) {
-		this.groupPosts = groupPosts;
-	}
+    public void setCommentsList(Set<Comment> commentsList) {
+        this.commentsList = commentsList;
+    }
 
-	public Set<UserPost> getUserPosts() {
-		return userPosts;
-	}
+    public Set<GroupPost> getGroupPosts() {
+        return groupPosts;
+    }
 
-	public void setUserPosts(Set<UserPost> userPosts) {
-		this.userPosts = userPosts;
-	}
+    public void setGroupPosts(Set<GroupPost> groupPosts) {
+        this.groupPosts = groupPosts;
+    }
 
-	public Set<Friendships> getFriendships() {
-		return friendships;
-	}
+    public Set<UserPost> getUserPosts() {
+        return userPosts;
+    }
 
-	public void setFriendships(Set<Friendships> friendships) {
-		this.friendships = friendships;
-	}
+    public void setUserPosts(Set<UserPost> userPosts) {
+        this.userPosts = userPosts;
+    }
 
-	public Set<FriendshipRequests> getSentRequests() {
-		return sentRequests;
-	}
+    public Set<Friendships> getFriendships() {
+        return friendships;
+    }
 
-	public void setSentRequests(Set<FriendshipRequests> sentRequests) {
-		this.sentRequests = sentRequests;
-	}
+    public void setFriendships(Set<Friendships> friendships) {
+        this.friendships = friendships;
+    }
 
-	public Set<FriendshipRequests> getReceivedRequests() {
-		return receivedRequests;
-	}
+    public Set<FriendshipRequests> getSentRequests() {
+        return sentRequests;
+    }
 
-	public void setReceivedRequests(Set<FriendshipRequests> receivedRequests) {
-		this.receivedRequests = receivedRequests;
-	}
-	
-	
-	@Override
-	public String toString() {
-	    return "User{" +
-	            "userId=" + userId +
-	            ", firstName='" + firstName + '\'' +
-	            ", lastName='" + lastName + '\'' +
-	            ", userName='" + userName + '\'' +
-	            ", email='" + email + '\'' +
-	            ", bio='" + bio + '\'' +
-	            ", role='" + role + '\'' +
-	            '}';
-	}
+    public void setSentRequests(Set<FriendshipRequests> sentRequests) {
+        this.sentRequests = sentRequests;
+    }
 
+    public Set<FriendshipRequests> getReceivedRequests() {
+        return receivedRequests;
+    }
 
+    public void setReceivedRequests(Set<FriendshipRequests> receivedRequests) {
+        this.receivedRequests = receivedRequests;
+    }
 }
-

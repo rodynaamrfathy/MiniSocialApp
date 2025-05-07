@@ -38,7 +38,69 @@ public abstract class Post {
     @Temporal(TemporalType.DATE)
     protected Date publishDate;
 
-    /** 🖼️ Optional image URL attached to the post */
+    @Override
+	public String toString() {
+		return "Post [postId=" + postId + ", publishDate=" + publishDate + ", imageUrl=" + imageUrl + ", content="
+				+ content + ", comments=" + comments + ", likes=" + likes + ", likesCount=" + likesCount + "]";
+	}
+
+	public int getPostId() {
+		return postId;
+	}
+
+	public void setPostId(int postId) {
+		this.postId = postId;
+	}
+
+	public Date getPublishDate() {
+		return publishDate;
+	}
+
+	public void setPublishDate(Date publishDate) {
+		this.publishDate = publishDate;
+	}
+
+	public String getImageUrl() {
+		return imageUrl;
+	}
+
+	public void setImageUrl(String imageUrl) {
+		this.imageUrl = imageUrl;
+	}
+
+	public String getContent() {
+		return content;
+	}
+
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public Set<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(Set<Comment> comments) {
+		this.comments = comments;
+	}
+
+	public Set<Like> getLikes() {
+		return likes;
+	}
+
+	public void setLikes(Set<Like> likes) {
+		this.likes = likes;
+	}
+
+	public int getLikesCount() {
+		return likesCount;
+	}
+
+	public void setLikesCount(int likesCount) {
+		this.likesCount = likesCount;
+	}
+
+	/** 🖼️ Optional image URL attached to the post */
     protected String imageUrl;
 
     /** 📝 Content of the post (Max 50 chars) */
@@ -55,5 +117,15 @@ public abstract class Post {
 
     /** 🔢 Cached count of likes for optimization */
     protected int likesCount;
+    
+
+    /** 👤 Abstract getter for the post author (User) */
+    public abstract User getUser();
+
+	public abstract Group getGroup();
+
+	public abstract void setUser(User user);
+
+	public abstract String getType();
 
 }

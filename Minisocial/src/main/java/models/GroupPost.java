@@ -25,10 +25,36 @@ public class GroupPost extends Post {
     @JoinColumn(name = "userId")
     private User user;
 
-    /** 👥 Group in which the post was published */
+    @Override
+    public String toString() {
+        return "GroupPost [user=" + user + ", group=" + group +
+               ", postId=" + getPostId() + ", content=" + getContent() + "]";
+    }
+
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	public Group getGroup() {
+		return group;
+	}
+
+	public void setGroup(Group group) {
+		this.group = group;
+	}
+
+	/** 👥 Group in which the post was published */
     @ManyToOne
     @JoinColumn(name = "groupId")
     private Group group;
 
-    
+    @Override
+    public String getType() {
+        return "GROUP_POST"; // Return a string identifier specific to group posts
+    }
 }

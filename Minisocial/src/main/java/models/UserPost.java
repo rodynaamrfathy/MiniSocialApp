@@ -20,10 +20,35 @@ import javax.persistence.ManyToOne;
 
 @Entity
 public class UserPost extends Post {
+	public UserPost() {
+	    // Required for JSON-B and JPA
+	}
 
-    /** 👤 Author of the user post */
+    @Override
+	public String toString() {
+		return "UserPost [user=" + user + "]";
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
+
+	/** 👤 Author of the user post */
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
+ // In UserPost.java
+    @Override
+    public Group getGroup() {
+        return null;  // No group for UserPost
+    }
+    @Override
+    public String getType() {
+        return "USER_POST"; // Return a string identifier specific to user posts
+    }
 }
