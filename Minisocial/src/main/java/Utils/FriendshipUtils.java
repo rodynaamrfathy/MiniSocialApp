@@ -11,7 +11,7 @@ import java.util.List;
 
 public class FriendshipUtils {
 
-    // ===================== 📜 JPQL Queries =====================
+    // ===================== ðŸ“œ JPQL Queries =====================
     public static final String GET_PENDING_REQUESTS_QUERY =
             "SELECT r FROM FriendshipRequests r WHERE r.receiver.id = :userId AND r.status = :status";
 
@@ -25,12 +25,28 @@ public class FriendshipUtils {
 
     public static final String GET_ALL_FRIENDS_QUERY =
             "SELECT f.friend FROM Friendships f WHERE f.user = :user";
+    
+    public static final String SUGGEST_FRIENDS_QUERY =
+    	    "SELECT u FROM User u WHERE u.id <> :userId " +
+    	    "AND u.id NOT IN (" +
+    	        "SELECT f.friend.id FROM Friendships f WHERE f.user.id = :userId" +
+    	    ") AND u.id IN (" +
+    	        "SELECT f2.friend.id FROM Friendships f1 " +
+    	        "JOIN Friendships f2 ON f1.friend.id = f2.user.id " +
+    	        "WHERE f1.user.id = :userId AND f2.friend.id <> :userId " +
+    	    ")";
 
-    // ===================== 🤝 Utility Logic =====================
+    // ===================== ðŸ¤� Utility Logic =====================
+    
+    public static List<User> suggestFriends(EntityManager em, Long userId) {
+        return em.createQuery(SUGGEST_FRIENDS_QUERY, User.class)
+                 .setParameter("userId", userId)
+                 .getResultList();
+    }
 
     public static boolean sendFriendRequest(EntityManager em, User requester, User receiver) {
         if (requester.getUserId().equals(receiver.getUserId())) {
-            System.out.println("❌ You can't send a friend request to yourself.");
+            System.out.println("â�Œ You can't send a friend request to yourself.");
             return false;
         }
 

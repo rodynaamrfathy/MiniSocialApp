@@ -18,6 +18,10 @@ public class FriendshipService {
     @PersistenceContext(unitName = "hello")
     private EntityManager em;
 
+    public List<User> suggestFriends(Long userId) {
+        return FriendshipUtils.suggestFriends(em, userId);
+    }
+
     public boolean sendFriendRequest(User requester, User receiver) {
         return FriendshipUtils.sendFriendRequest(em, requester, receiver);
     }

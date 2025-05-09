@@ -21,6 +21,23 @@ public class FriendshipResource {
 
     @Inject
     private UserService userService;
+    
+    @GET
+    @Path("/{userId}/suggestions")
+    public Response getSuggestedFriends(@PathParam("userId") Long userId) {
+        User user = userService.getUserById(userId);
+        if (user == null) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found.").build();
+        }
+
+        List<User> suggestedUsers = friendshipService.suggestFriends(userId);
+        if (suggestedUsers.isEmpty()) {
+            return Response.ok("No friend suggestions found.").build();
+        }
+
+        List<Map<String, Object>> suggestedInfos = friendshipService.mapFriendInfos(suggestedUsers);
+        return Response.ok(suggestedInfos).build();
+    }
 
     @POST
     @Path("/{requesterId}/request/{receiverId}")
@@ -36,7 +53,7 @@ public class FriendshipResource {
         // Check for self-request and existing requests
         if (friendshipService.isSelfRequest(requester, receiver)) {
             return Response.status(Response.Status.BAD_REQUEST)
-                           .entity("❌ You can't send a friend request to yourself.")
+                           .entity("â�Œ You can't send a friend request to yourself.")
                            .build();
         }
 

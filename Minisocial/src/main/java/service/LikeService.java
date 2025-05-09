@@ -25,8 +25,7 @@ public class LikeService {
     }
 
     public List<Friendships> getAllFriendshipsForUser(User user) {
-        String jpql = "SELECT f FROM Friendships f WHERE f.user.userId = :userId OR f.friend.userId = :userId";
-        TypedQuery<Friendships> query = em.createQuery(jpql, Friendships.class);
+        TypedQuery<Friendships> query = em.createQuery(LikeUtils.GET_ALL_FRIENDS_QUERY, Friendships.class);
         query.setParameter("userId", user.getUserId());
         return query.getResultList();
     }
@@ -49,6 +48,9 @@ public class LikeService {
         like.setUser(user);
         like.setPost(post);
         em.persist(like);
+        
+        post.setLikesCount(post.getLikesCount() + 1);
+        em.merge(post);
 
         return List.of();
     }
