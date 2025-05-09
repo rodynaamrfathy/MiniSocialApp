@@ -91,4 +91,32 @@ public class UserService {
 
         return userStrings;
     }
+    
+    public List<String> searchUsersByUsername(String userName) {
+        TypedQuery<User> query = em.createQuery(UserUtils.SEARCH_BY_USERNAME_QUERY, User.class);
+        query.setParameter("userName", "%" + userName + "%"); 
+
+        List<User> users = query.getResultList();
+        List<String> userStrings = new ArrayList<>();
+        for (User user : users) {
+            userStrings.add(user.toString());
+        }
+
+        return userStrings;
+    }
+
+    public List<String> searchUsersByEmail(String email) {
+        TypedQuery<User> query = em.createQuery(UserUtils.SEARCH_BY_EMAIL_QUERY, User.class);
+        query.setParameter("email", "%" + email + "%"); 
+
+        List<User> users = query.getResultList();
+        List<String> userStrings = new ArrayList<>();
+        for (User user : users) {
+            userStrings.add(user.toString());
+        }
+
+        return userStrings;
+    }
+
+
 }
