@@ -13,9 +13,58 @@ import javax.persistence.*;
  * - Many-to-Many with `User` for group admins ✅
  */
 @Entity
+@Table(name = "`Group`")
 public class Group {
 
-    /** 🔑 Primary key for the group */
+    public Long getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(Long groupId) {
+		this.groupId = groupId;
+	}
+
+	public String getGroupName() {
+		return groupName;
+	}
+
+	public void setGroupName(String groupName) {
+		this.groupName = groupName;
+	}
+
+	public Boolean getIsOpen() {
+		return isOpen;
+	}
+
+	public void setIsOpen(Boolean isOpen) {
+		this.isOpen = isOpen;
+	}
+
+	public Set<GroupPost> getGroupPosts() {
+		return groupPosts;
+	}
+
+	public void setGroupPosts(Set<GroupPost> groupPosts) {
+		this.groupPosts = groupPosts;
+	}
+
+	public Set<User> getGroupAdmins() {
+		return groupAdmins;
+	}
+
+	public void setGroupAdmins(Set<User> groupAdmins) {
+		this.groupAdmins = groupAdmins;
+	}
+
+	public Set<GroupMembership> getMemberships() {
+		return memberships;
+	}
+
+	public void setMemberships(Set<GroupMembership> memberships) {
+		this.memberships = memberships;
+	}
+
+	/** 🔑 Primary key for the group */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long groupId;
