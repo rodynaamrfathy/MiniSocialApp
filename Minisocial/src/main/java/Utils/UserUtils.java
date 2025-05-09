@@ -16,6 +16,13 @@ public class UserUtils {
     public static final String GET_USER_BY_ID_QUERY = "SELECT u FROM User u WHERE u.userId = :userId";
     public static final String GET_ALL_USERS_QUERY = "SELECT u FROM User u";
     public static final String EMAIL_TAKEN_QUERY = "SELECT COUNT(u) FROM User u WHERE u.email = :email";
+    
+    public static final String SEARCH_BY_USERNAME_QUERY =
+    	    "SELECT u FROM User u WHERE u.userName LIKE :userName";
+
+    	public static final String SEARCH_BY_EMAIL_QUERY =
+    	    "SELECT u FROM User u WHERE u.email LIKE :email";
+
 
     // Validate user input
     public static List<String> validateUser(User user, EntityManager em) {

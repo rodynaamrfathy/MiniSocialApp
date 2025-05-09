@@ -93,4 +93,45 @@ public class UserResource {
 
         return Response.ok(userStrings.get(0)).build();
     }
+    
+    @GET
+    @Path("/search/username")
+    public Response searchByUsername(@QueryParam("q") String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity("Username query must not be empty.")
+                           .build();
+        }
+
+        List<String> result = userService.searchUsersByUsername(query);
+
+        if (result.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND)
+                           .entity("No such username")
+                           .build();
+        }
+
+        return Response.ok(result).build();
+    }
+
+    @GET
+    @Path("/search/email")
+    public Response searchByEmail(@QueryParam("q") String query) {
+        if (query == null || query.trim().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST)
+                           .entity("Email query must not be empty.")
+                           .build();
+        }
+
+        List<String> result = userService.searchUsersByEmail(query);
+
+        if (result.isEmpty()) {
+            return Response.status(Response.Status.NOT_FOUND)
+                           .entity("No such email")
+                           .build();
+        }
+
+        return Response.ok(result).build();
+    }
+
 }
