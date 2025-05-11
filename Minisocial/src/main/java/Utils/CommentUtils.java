@@ -11,6 +11,9 @@ public class CommentUtils {
 
     public static final String GET_COMMENTS_BY_POST_QUERY =
         "SELECT c FROM Comment c WHERE c.post.postId = :postId ORDER BY c.timestamp ASC";
+    
+    public static final String GET_ALL_FRIENDS_QUERY =
+        	"SELECT f FROM Friendships f WHERE f.user.userId = :userId OR f.friend.userId = :userId";
 
     public static List<String> validateComment(Comment comment, List<Friendships> friendships) {
         List<String> errors = new ArrayList<>();
