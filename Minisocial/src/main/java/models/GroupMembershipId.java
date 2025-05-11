@@ -3,39 +3,44 @@ package models;
 import java.io.Serializable;
 import java.util.Objects;
 
-/**
- * 🔗 Composite primary key for `GroupMembership` entity.
- * 
- * 💡 Consists of:
- * - Group
- * - User
- * - Membership ID
- */
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+
+@Embeddable
 public class GroupMembershipId implements Serializable {
+    @Column(name = "group_id")
+    private Long groupId;
+    
+    @Column(name = "user_id")
+    private Long userId;
 
-    /** Group part of the key */
-    private Group group;
+	public Long getGroupId() {
+		return groupId;
+	}
+	public void setGroupId(Long groupId) {
+		this.groupId = groupId;
+	}
+	public Long getUserId() {
+		return userId;
+	}
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+	@Override
+	public int hashCode() {
+		return Objects.hash(groupId, userId);
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		GroupMembershipId other = (GroupMembershipId) obj;
+		return Objects.equals(groupId, other.groupId) && Objects.equals(userId, other.userId);
+	}
 
-    /** User part of the key */
-    private User user;
-
-    /** Membership ID part of the key */
-    private int membershipId;
-
-    public GroupMembershipId() {}
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof GroupMembershipId)) return false;
-        GroupMembershipId that = (GroupMembershipId) o;
-        return membershipId == that.membershipId &&
-               Objects.equals(group, that.group) &&
-               Objects.equals(user, that.user);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(group, user, membershipId);
-    }
+    // Getters and Setters, equals() and hashCode() methods
 }

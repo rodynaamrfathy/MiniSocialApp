@@ -1,47 +1,85 @@
 package models;
 
-import java.util.Date;
 import javax.persistence.*;
+import java.util.Date;
 import enums.GroupMemberShipStatusEnum;
 
 /**
- * 🤝 Represents a user’s membership in a group.
+ * GroupMembership Entity
  * 
- * 📌 Composite key: (group, user, membershipId) ✅
- * 📌 Includes role, joined date, and status.
+ * Represents the membership of a user in a group, with a unique membershipId as primary key.
  */
 @Entity
-@IdClass(GroupMembershipId.class)
 public class GroupMembership {
 
-    /** 🔑 Unique ID for the membership */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long membershipId;
+    private Long id;
 
-    /** 🔗 Associated group */
-    @Id
     @ManyToOne
-    @JoinColumn(name = "groupId")
-    private Group group;
-
-    /** 👤 Associated user */
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
-    /** 🏷️ Role of the user in the group (e.g., member/admin) */
-    @Column(length = 50)
-    private String role;
-
-    /** 📅 When the user joined the group */
-    @Temporal(TemporalType.DATE)
-    private Date joinedDate;
-
-    /** 📌 Current membership status (ACTIVE, PENDING, etc.) */
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private Group group;
+    
+    private String role;  // Role like 'admin', 'member', etc.
+    
     @Enumerated(EnumType.STRING)
     private GroupMemberShipStatusEnum status;
 
-    // Getters & Setters...
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date joinedDate;
+
+    // Getters and Setters
+
+
+    public Group getGroup() {
+        return group;
+    }
+
+    public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public void setGroup(Group group) {
+        this.group = group;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public GroupMemberShipStatusEnum getStatus() {
+        return status;
+    }
+
+    public void setStatus(GroupMemberShipStatusEnum status) {
+        this.status = status;
+    }
+
+    public Date getJoinedDate() {
+        return joinedDate;
+    }
+
+    public void setJoinedDate(Date joinedDate) {
+        this.joinedDate = joinedDate;
+    }
 }

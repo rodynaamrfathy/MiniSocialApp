@@ -2,6 +2,7 @@ package models;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 import enums.RoleEnum;
 
@@ -31,11 +32,44 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
+    // 👑 Admins for groups (Many-to-Many)
+    @ManyToMany
+    @JoinTable(
+        name = "group_admins", 
+        joinColumns = @JoinColumn(name = "user_id"), 
+        inverseJoinColumns = @JoinColumn(name = "group_id")
+    )
+    private Set<Group> adminOfGroups = new HashSet<>();
+    
     // 📋 User Info
     @Column(length = 50)
     private String firstName;
 
-    @Column(length = 50)
+
+
+	public Set<Group> getAdminOfGroups() {
+		return adminOfGroups;
+	}
+
+
+
+	public void setAdminOfGroups(Set<Group> adminOfGroups) {
+		this.adminOfGroups = adminOfGroups;
+	}
+
+
+
+	public Set<Group> getAdminOfGroups1() {
+		return adminOfGroups1;
+	}
+	
+	
+
+	public void setAdminOfGroups1(Set<Group> adminOfGroups1) {
+		this.adminOfGroups1 = adminOfGroups1;
+	}
+
+	@Column(length = 50)
     private String lastName;
 
     @Column(length = 50)
@@ -63,7 +97,7 @@ public class User {
 
     // 👑 2️⃣ User ↔ Admin of Groups (Many Admins per Group)
     @ManyToMany(mappedBy = "groupAdmins", fetch = FetchType.LAZY)
-    private Set<Group> adminOfGroups;
+    private Set<Group> adminOfGroups1;
 
     // ❤️ 3️⃣ User ↔ Likes (A user can like many posts)
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
@@ -191,13 +225,6 @@ public class User {
         this.memberships = memberships;
     }
 
-    public Set<Group> getAdminOfGroups() {
-        return adminOfGroups;
-    }
-
-    public void setAdminOfGroups(Set<Group> adminOfGroups) {
-        this.adminOfGroups = adminOfGroups;
-    }
 
     public Set<Like> getListOfLikedPosts() {
         return listOfLikedPosts;
