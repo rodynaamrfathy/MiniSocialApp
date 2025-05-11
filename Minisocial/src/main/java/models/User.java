@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 import javax.persistence.*;
 import enums.RoleEnum;
@@ -95,6 +96,11 @@ public class User {
     // 📥 9️⃣ Received Friend Requests (User is receiver)
     @OneToMany(mappedBy = "receiver")
     private Set<FriendshipRequests> receivedRequests;
+    
+    @OneToMany
+    @JoinColumn(name = "notificationId")
+    private List<NotificationEntity> notificationsRecived;
+
 
     // ✅ All Getters & Setters...
 
