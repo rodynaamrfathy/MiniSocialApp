@@ -12,6 +12,9 @@ public class LikeUtils {
 
     public static final String GET_LIKES_BY_POST_QUERY =
         "SELECT l FROM Like l WHERE l.post.postId = :postId";
+    
+    public static final String GET_ALL_FRIENDS_QUERY =
+    	"SELECT f FROM Friendships f WHERE f.user.userId = :userId OR f.friend.userId = :userId";
 
     public static List<String> validateLike(User user, UserPost post, List<Like> existingLikes, List<Friendships> friendships) {
         List<String> errors = new ArrayList<>();

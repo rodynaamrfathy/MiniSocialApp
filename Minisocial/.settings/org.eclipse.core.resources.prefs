@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//src/main/java/Utils/FriendshipUtils.java=UTF-8
 encoding//src/main/java/Utils/LikeUtils.java=UTF-8
 encoding//src/main/java/Utils/PostUtil.java=UTF-8
 encoding//src/main/java/models/Comment.java=UTF-8
@@ -12,6 +13,7 @@ encoding//src/main/java/models/Like.java=UTF-8
 encoding//src/main/java/models/Post.java=UTF-8
 encoding//src/main/java/models/User.java=UTF-8
 encoding//src/main/java/models/UserPost.java=UTF-8
+encoding//src/main/java/recources/FriendshipResource.java=UTF-8
 encoding//src/main/java/recources/UserResource.java=UTF-8
 encoding//src/main/java/service/LikeService.java=UTF-8
 encoding//src/main/java/service/UserService.java=UTF-8

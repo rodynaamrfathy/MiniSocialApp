@@ -1,6 +1,7 @@
 package service;
 
 import Utils.CommentUtils;
+import Utils.LikeUtils;
 import models.*;
 
 import javax.ejb.Stateless;
@@ -25,8 +26,7 @@ public class CommentService {
     }
 
     public List<Friendships> getAllFriendshipsForUser(User user) {
-        String jpql = "SELECT f FROM Friendships f WHERE f.user.userId = :userId OR f.friend.userId = :userId";
-        TypedQuery<Friendships> query = em.createQuery(jpql, Friendships.class);
+        TypedQuery<Friendships> query = em.createQuery(LikeUtils.GET_ALL_FRIENDS_QUERY, Friendships.class);
         query.setParameter("userId", user.getUserId());
         return query.getResultList();
     }
@@ -52,6 +52,9 @@ public class CommentService {
         if (!errors.isEmpty()) {
             return errors;
         }
+
+        post.setCommentsCount(post.getCommentsCount() + 1);
+        em.merge(post);
 
         em.persist(comment);
         return List.of();

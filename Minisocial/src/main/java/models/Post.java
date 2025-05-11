@@ -99,6 +99,14 @@ public abstract class Post {
 	public void setLikesCount(int likesCount) {
 		this.likesCount = likesCount;
 	}
+	
+	public int getCommentsCount() {
+		return commentsCount;
+	}
+
+	public void setCommentsCount(int commentsCount) {
+		this.commentsCount = commentsCount;
+	}
 
 	/** 🖼️ Optional image URL attached to the post */
     protected String imageUrl;
@@ -118,7 +126,8 @@ public abstract class Post {
     /** 🔢 Cached count of likes for optimization */
     protected int likesCount;
     
-
+    protected int commentsCount;
+    
     /** 👤 Abstract getter for the post author (User) */
     public abstract User getUser();
 
