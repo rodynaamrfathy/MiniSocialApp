@@ -1,5 +1,6 @@
 package models;
 
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
@@ -126,6 +127,10 @@ public class User {
     // 📥 9️⃣ Received Friend Requests (User is receiver)
     @OneToMany(mappedBy = "receiver", fetch = FetchType.LAZY)
     private Set<FriendshipRequests> receivedRequests;
+    
+    @OneToMany(mappedBy = "user")
+    private Set<NotificationEntity> notificationsRecived;
+
 
     // ✅ All Getters & Setters...
 

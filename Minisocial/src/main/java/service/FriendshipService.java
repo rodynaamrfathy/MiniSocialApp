@@ -10,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.HashMap;
 
 @Stateless
@@ -83,7 +84,7 @@ public class FriendshipService {
             map.put("bio", friend.getBio());
             map.put("birthdate", friend.getBirthdate());
             return map;
-        }).toList();
+        }).collect(Collectors.toList());
         return friendInfos;
     }
 

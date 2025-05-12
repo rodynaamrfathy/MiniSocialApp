@@ -19,6 +19,7 @@ import javax.persistence.*;
 @Table(name = "groupposts")
 public class GroupPost extends Post {
 
+	
     
     /** 👤 Author of the post */
     @ManyToOne

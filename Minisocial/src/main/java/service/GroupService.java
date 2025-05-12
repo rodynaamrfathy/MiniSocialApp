@@ -1,119 +1,138 @@
 package service;
 
+import Utils.GroupUtil;
+import dtos.GroupDTO;
+import enums.GroupMemberShipStatusEnum;
 import models.Group;
-import models.User;
-import models.GroupDTO;
 import models.GroupMembership;
+import models.User;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import javax.ws.rs.WebApplicationException;
-
-import enums.GroupMemberShipStatusEnum;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 /**
- * 📦 GroupService handles the business logic for creating a group and assigning an admin.
+ * 📦 GroupService
+ *
+ * This stateless EJB handles business logic related to Group management,
+ * including group creation, membership assignment, and retrieval of approved group members.
  * 
- * 🚀 Responsibilities:
- * - Creates new groups
- * - Ensures group name uniqueness
- * - Assigns group admin
+ * 💡 Responsibilities:
+ * - Validating admin user existence and group name uniqueness
+ * - Persisting new groups and admin memberships
+ * - Fetching approved group memberships
+ *
+ * ➡ Works closely with:
+ * - GroupUtil for validation logic
+ * - EntityManager for database operations
  */
 @Stateless
 public class GroupService {
 
+    /**
+     * 🗄️ EntityManager instance for interacting with the persistence context.
+     */
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * 📦 GroupCreationResult
+     *
+     * Helper class to encapsulate the result of group creation operation.
+     * Can return either a successfully created GroupDTO or a list of validation errors.
+     */
+    public static class GroupCreationResult {
+        /** The created GroupDTO if successful. */
+        public GroupDTO groupDTO;
+
+        /** The list of validation errors if creation failed. */
+        public List<String> errors;
+
+        /**
+         * Constructor for successful group creation.
+         *
+         * @param groupDTO The created GroupDTO object.
+         */
+        public GroupCreationResult(GroupDTO groupDTO) {
+            this.groupDTO = groupDTO;
+            this.errors = null;
+        }
+
+        /**
+         * Constructor for failed group creation with validation errors.
+         *
+         * @param errors The list of error messages.
+         */
+        public GroupCreationResult(List<String> errors) {
+            this.errors = errors;
+            this.groupDTO = null;
+        }
+    }
+
+    /**
+     * 🏗️ Creates a new group and assigns the given user as the admin.
+     *
+     * 🔍 Steps:
+     * - Validates admin user existence.
+     * - Checks for group name uniqueness.
+     * - Persists the new group.
+     * - Assigns the admin user as a group member with 'admin' role.
+     *
+     * @param groupDTO The DTO containing group details (name, description, isOpen).
+     * @param adminId  The ID of the user to be set as group admin.
+     * @return GroupCreationResult containing either created GroupDTO or validation errors.
+     */
     @Transactional
-    public GroupDTO createGroup(GroupDTO groupDTO, Long adminId) {
+    public GroupCreationResult createGroup(GroupDTO groupDTO, Long adminId) {
         List<String> validationErrors = new ArrayList<>();
-        
-        // Find the admin user
-        User adminUser = entityManager.find(User.class, adminId);
-        if (adminUser == null) {
-            validationErrors.add("Admin user not found.");
-        }
 
-        // Check if a group with the same name already exists
-        boolean groupExists = entityManager
-            .createQuery("SELECT COUNT(g) FROM Group g WHERE g.groupName = :name", Long.class)
-            .setParameter("name", groupDTO.getGroupName())
-            .getSingleResult() > 0;
+        // Validate admin user existence
+        User adminUser = GroupUtil.validateAdminUser(adminId, entityManager, validationErrors);
 
-        if (groupExists) {
-            validationErrors.add("Group with the same name already exists.");
-        }
+        // Validate group name uniqueness
+        GroupUtil.validateGroupNameUniqueness(groupDTO.getGroupName(), entityManager, validationErrors);
 
-        // If validation errors exist, throw WebApplicationException with error messages
+        // Return errors if validation fails
         if (!validationErrors.isEmpty()) {
-            throw new WebApplicationException(buildErrorResponse(validationErrors), 400);
+            return new GroupCreationResult(validationErrors);
         }
 
-        // Create and persist the new group
+        // Create and persist group
         Group group = new Group();
         group.setGroupName(groupDTO.getGroupName());
         group.setDescription(groupDTO.getDescription());
         group.setIsOpen(groupDTO.getIsOpen());
         entityManager.persist(group);
-        System.out.println("Group created: " + group.getGroupName()); // Debug print
 
-        // Call the method to handle the GroupMembership persistence
-        persistGroupMembership(adminId, group);  // Call this method for the GroupMembership persistence
+        // Add admin to the group as membership
+        GroupMembership membership = new GroupMembership();
+        membership.setUser(adminUser);
+        membership.setGroup(group);
+        membership.setRole("admin");
+        membership.setStatus(GroupMemberShipStatusEnum.approved);
+        membership.setJoinedDate(new Date());
+        entityManager.persist(membership);
 
-        return GroupDTO.fromGroup(group);
+        return new GroupCreationResult(GroupDTO.fromGroup(group));
     }
 
-    // Separate method to persist the GroupMembership
-    private void persistGroupMembership(Long adminId, Group group) {
-        // Retrieve the admin user
-        User adminUser = entityManager.find(User.class, adminId);
-        if (adminUser == null) {
-            throw new WebApplicationException("Admin user not found.", 400);
-        }
-
-        // Insert the admin as a GroupMembership entry
-        GroupMembership groupMembership = new GroupMembership();
-        groupMembership.setUser(adminUser);      // Set the admin user
-        groupMembership.setGroup(group);         // Set the newly created group
-        groupMembership.setRole("admin");        // Role is 'admin' for the admin user
-        groupMembership.setStatus(GroupMemberShipStatusEnum.approved);  // Assume status is active
-        groupMembership.setJoinedDate(new Date()); // Set current date as the join date
-
-        // Debug print
-        System.out.println("Inserting GroupMembership for admin user: " + adminUser.getUserName() 
-                            + " in group: " + group.getGroupName());
-
-        // Persist the new group membership
-        entityManager.persist(groupMembership);
-
-        // Debug print
-        System.out.println("GroupMembership inserted for user: " + adminUser.getUserName() 
-                            + " in group: " + group.getGroupName());
+    /**
+     * 🔍 Retrieves all approved memberships for a given group.
+     *
+     * @param groupId The ID of the group.
+     * @return List of approved GroupMembership entities.
+     */
+    public List<GroupMembership> getApprovedMembershipsByGroupId(Long groupId) {
+        return entityManager.createQuery(
+                "SELECT gm FROM GroupMembership gm WHERE gm.group.groupId = :groupId AND gm.status = :status",
+                GroupMembership.class)
+                .setParameter("groupId", groupId)
+                .setParameter("status", GroupMemberShipStatusEnum.approved)
+                .getResultList();
     }
-
-    private String buildErrorResponse(List<String> validationErrors) {
-        StringBuilder errorMessage = new StringBuilder("Errors: ");
-        for (String error : validationErrors) {
-            errorMessage.append("\n").append(error);
-        }
-        return errorMessage.toString();
-    }
-
-    public List<GroupMembership> getGroupMembershipsByGroupId(Long groupId) {
-        // Query to find all group memberships for a specific group
-        return entityManager.createQuery("SELECT gm FROM GroupMembership gm WHERE gm.group.id = :groupId", GroupMembership.class)
-                            .setParameter("groupId", groupId)
-                            .getResultList();
-    }
-
-
 }
-
-
