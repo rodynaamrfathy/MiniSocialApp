@@ -1,6 +1,10 @@
 package models;
 
 import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import enums.GroupMemberShipStatusEnum;
 
 public class GroupMembershipDTO {
 
@@ -13,7 +17,7 @@ public class GroupMembershipDTO {
     private String status;
     private Date joinedDate;
 
-    // Constructors, Getters, and Setters
+    public GroupMembershipDTO() {}
 
     public GroupMembershipDTO(Long id, Long userId, String userName, Long groupId, String groupName, String role, String status, Date joinedDate) {
         this.id = id;
@@ -27,6 +31,7 @@ public class GroupMembershipDTO {
     }
 
     // Getters and Setters
+
     public Long getId() {
         return id;
     }
@@ -91,17 +96,24 @@ public class GroupMembershipDTO {
         this.joinedDate = joinedDate;
     }
 
-    // Utility method to convert GroupMembership entity to DTO
-    public static GroupMembershipDTO fromGroupMembership(GroupMembership groupMembership) {
+    public static GroupMembershipDTO fromEntity(GroupMembership membership) {
         return new GroupMembershipDTO(
-            groupMembership.getId(),
-            groupMembership.getUser().getUserId(),
-            groupMembership.getUser().getUserName(),
-            groupMembership.getGroup().getGroupId(),
-            groupMembership.getGroup().getGroupName(),
-            groupMembership.getRole(),
-            groupMembership.getStatus().toString(),
-            groupMembership.getJoinedDate()
+                membership.getId(),
+                membership.getUser().getUserId(),
+                membership.getUser().getUserName(),
+                membership.getGroup().getGroupId(),
+                membership.getGroup().getGroupName(),
+                membership.getRole(),
+                membership.getStatus().toString(),
+                membership.getJoinedDate()
         );
     }
+
+    public static List<GroupMembershipDTO> fromEntityList(List<GroupMembership> memberships) {
+        return memberships.stream()
+                .filter(m -> m.getStatus() == GroupMemberShipStatusEnum.approved) // Ensure filtering!
+                .map(GroupMembershipDTO::fromEntity)
+                .collect(Collectors.toList());
+    }
+
 }
