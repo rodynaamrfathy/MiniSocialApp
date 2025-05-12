@@ -1,6 +1,8 @@
 package recources;
 
 import enums.FriendshipStatus;
+import messaging.ActivityLogEvent;
+import messaging.ActivityLogProducer;
 import messaging.NotificationEvent;
 import messaging.NotificationProducer;
 import models.FriendshipRequests;
@@ -44,6 +46,7 @@ public class FriendshipResource {
     @Inject
     private NotificationProducer notificationProducer;
     
+<<<<<<< HEAD
     /**
      * Get suggested friends for a user.
      * 
@@ -52,6 +55,12 @@ public class FriendshipResource {
      * @param userId The ID of the user requesting friend suggestions.
      * @return Response containing the list of suggested friends or a message if no suggestions exist.
      */
+=======
+    @Inject
+    private ActivityLogProducer activityLogProducer;
+    
+    
+>>>>>>> abd03d5ce0325ac573dac2762219035a663f4f3a
     @GET
     @Path("/{userId}/suggestions")
     public Response getSuggestedFriends(@PathParam("userId") Long userId) {
@@ -137,6 +146,12 @@ public class FriendshipResource {
         }
 
         boolean success = friendshipService.acceptFriendRequest(request);
+        
+		// log activity
+        activityLogProducer.sendActivityLog(
+        	    new ActivityLogEvent((long) requestId, "friend added", "")
+        	);
+        
         return success ? Response.ok("Friend request accepted.").build()
                        : Response.status(Response.Status.BAD_REQUEST)
                                  .entity("Failed to accept friend request.")
