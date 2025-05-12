@@ -1,6 +1,9 @@
 package recources;
 
 import models.Comment;
+import models.GroupPost;
+import models.User;
+import models.UserPost;
 import service.CommentService;
 
 import javax.inject.Inject;
@@ -8,6 +11,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import dtos.CommentDTO;
+import messaging.NotificationEvent;
+import messaging.NotificationProducer;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +31,10 @@ public class CommentResource {
     @Inject
     private CommentService commentService;
 
+    @Inject
+    private NotificationProducer notificationProducer;
+    
+    
     /**
      * Adds a comment to a UserPost.
      * The comment is associated with a user and a post.
@@ -39,6 +48,25 @@ public class CommentResource {
     public Response addCommentToUserPost(@PathParam("postId") int postId,
                                          @PathParam("userId") Long userId,
                                          Map<String, String> json) {
+    	
+    	 // 2) Fetch commenter and post-author
+        User commenter = commentService.findUserById(userId);
+        UserPost post     = commentService.findUserPostById(postId);
+        User author       = post != null ? post.getUser() : null;
+
+        // 3) Send notification to author (if not commenting on own post)
+        if (commenter != null && author != null && !commenter.getUserId().equals(author.getUserId())) {
+            String message = commenter.getFirstName() + " commented on your post.";
+            NotificationEvent event = new NotificationEvent(
+                commenter.getUserId(),
+                author.getUserId(),
+                "COMMENT_ADDED",
+                message
+            );
+            notificationProducer.sendNotification(event);
+        }
+
+    	
         // Delegating the logic to the common handler method for adding comments
         return handleAddComment(postId, userId, json, null, "userpost");
     }
@@ -58,6 +86,25 @@ public class CommentResource {
                                           @PathParam("userId") Long userId,
                                           @PathParam("groupId") Long groupId,
                                           Map<String, String> json) {
+    	
+        // 2) Fetch commenter and post-author
+        User commenter = commentService.findUserById(userId);
+        GroupPost post  = commentService.findGroupPostById(postId);
+        User author     = post != null ? post.getUser() : null;
+
+        // 3) Send notification to author (if not commenting on own group post)
+        if (commenter != null && author != null && !commenter.getUserId().equals(author.getUserId())) {
+            String message = commenter.getFirstName() + " commented on your group post in \"" 
+                           + post.getGroup().getGroupName() + "\".";
+            NotificationEvent event = new NotificationEvent(
+                commenter.getUserId(),
+                author.getUserId(),
+                "COMMENT_ADDED",
+                message
+            );
+            notificationProducer.sendNotification(event);
+        }
+        
         // Delegating the logic to the common handler method for adding comments
         return handleAddComment(postId, userId, json, groupId, "grouppost");
     }
