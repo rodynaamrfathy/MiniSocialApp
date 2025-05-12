@@ -11,6 +11,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import dtos.LikeDTO;
+import messaging.ActivityLogEvent;
+import messaging.ActivityLogProducer;
 import messaging.NotificationEvent;
 import messaging.NotificationProducer;
 
@@ -35,6 +37,9 @@ public class LikeResource {
 
     @Inject
     private NotificationProducer notificationProducer;
+    
+    @Inject
+    private ActivityLogProducer activityLogProducer;
 
 
     // ➡️ Like a UserPost
@@ -62,6 +67,12 @@ public class LikeResource {
             UserPost post = commentService.findUserPostById(postId);
             User author = post != null ? post.getUser() : null;
 
+
+			// log activity
+            activityLogProducer.sendActivityLog(
+            	    new ActivityLogEvent(userId, "LIKED", "Liked post #" + postId)
+            	);
+            
             // Send notification if not self-like
             if (liker != null && author != null && !liker.getUserId().equals(author.getUserId())) {
                 String message = liker.getFirstName() + " liked your post.";

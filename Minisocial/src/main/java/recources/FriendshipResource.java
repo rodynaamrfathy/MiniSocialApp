@@ -1,6 +1,8 @@
 package recources;
 
 import enums.FriendshipStatus;
+import messaging.ActivityLogEvent;
+import messaging.ActivityLogProducer;
 import messaging.NotificationEvent;
 import messaging.NotificationProducer;
 import models.FriendshipRequests;
@@ -27,6 +29,10 @@ public class FriendshipResource {
     
     @Inject
     private NotificationProducer notificationProducer;
+    
+    @Inject
+    private ActivityLogProducer activityLogProducer;
+    
     
     @GET
     @Path("/{userId}/suggestions")
@@ -98,6 +104,12 @@ public class FriendshipResource {
         }
 
         boolean success = friendshipService.acceptFriendRequest(request);
+        
+		// log activity
+        activityLogProducer.sendActivityLog(
+        	    new ActivityLogEvent((long) requestId, "friend added", "")
+        	);
+        
         return success ? Response.ok("Friend request accepted.").build()
                        : Response.status(Response.Status.BAD_REQUEST)
                                  .entity("Failed to accept friend request.")

@@ -4,6 +4,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+
+import messaging.ActivityLogEvent;
+import messaging.ActivityLogProducer;
 import models.UserPost;
 import models.UserPostDTO;
 import service.PostService;
@@ -16,7 +19,9 @@ public class PostResource {
     @Inject
     PostService postService; 
 
-
+    
+    @Inject
+    private ActivityLogProducer activityLogProducer;
     
     @GET
     @Path("/timeline/{userId}")
@@ -85,6 +90,10 @@ public class PostResource {
             }
 
             UserPostDTO createdPostDTO = UserPostDTO.fromUserPost(userPost);
+			// log activity
+            activityLogProducer.sendActivityLog(
+            	    new ActivityLogEvent(userId, "Created a Post",  " ")
+            	);
             return Response.status(Response.Status.CREATED)
                            .entity(createdPostDTO)
                            .build();
