@@ -8,6 +8,7 @@ import models.User;
 import javax.persistence.EntityManager;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class FriendshipUtils {
 
@@ -101,7 +102,7 @@ public class FriendshipUtils {
                 .setParameter("status", FriendshipStatus.PENDING)
                 .getResultList();
 
-        return requests.stream().map(FriendshipRequests::toString).toList();
+        return requests.stream().map(FriendshipRequests::toString).collect(Collectors.toList());
     }
 
     public static List<User> getAllFriendsOfUser(EntityManager em, User user) {

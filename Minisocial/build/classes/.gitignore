@@ -1,6 +1,6 @@
-/service/
+/.DS_Store
+/messaging/
+/models/
 /recources/
-/models/
+/service/
 /Utils/
-/dtos/
-/models/

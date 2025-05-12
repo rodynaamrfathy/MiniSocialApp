@@ -1,6 +1,8 @@
 package recources;
 
 import enums.FriendshipStatus;
+import messaging.NotificationEvent;
+import messaging.NotificationProducer;
 import models.FriendshipRequests;
 import models.User;
 import service.FriendshipService;
@@ -10,6 +12,7 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Path("/friendships")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -21,6 +24,9 @@ public class FriendshipResource {
 
     @Inject
     private UserService userService;
+    
+    @Inject
+    private NotificationProducer notificationProducer;
     
     @GET
     @Path("/{userId}/suggestions")
@@ -64,9 +70,20 @@ public class FriendshipResource {
                            .build();
         }
 
+     //  Send Notification
+        String message = requester.getFirstName() + " " + requester.getLastName() + " sent you a friend request.";
+        NotificationEvent event = new NotificationEvent(
+            requester.getUserId(),
+            receiver.getUserId(),
+            "FRIEND_REQUEST_RECEIVED",
+            message
+        );
+        notificationProducer.sendNotification(event);
+
         return Response.status(Response.Status.CREATED)
                        .entity("Friend request sent successfully.")
                        .build();
+        
     }
 
     @POST
@@ -148,6 +165,7 @@ public class FriendshipResource {
 
         return Response.ok(friendInfos).build();
     }
+
 
     @GET
     @Path("/friendProfile/{userId}/{friendId}")
