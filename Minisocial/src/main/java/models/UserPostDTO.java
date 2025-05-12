@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class UserPostDTO {
-    private Long id;
+    private Integer id;
     private String content;
     private String imageUrl;
     private Date publishDate;
@@ -13,11 +13,11 @@ public class UserPostDTO {
     private String userName; 
 
     // Getters and Setters
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -64,23 +64,21 @@ public class UserPostDTO {
     // Static method to convert a UserPost to a UserPostDTO
     public static UserPostDTO fromUserPost(UserPost userPost) {
         UserPostDTO dto = new UserPostDTO();
-        dto.setId(userPost.getPostId()); 
-        dto.setContent(userPost.getContent());
-        dto.setImageUrl(userPost.getImageUrl());
-        dto.setPublishDate(userPost.getPublishDate());
-        
-        // Null checks to avoid NullPointerException
-        if (userPost.getUser() != null) {
-            dto.setUserId(userPost.getUser().getUserId()); 
-            dto.setUserName(userPost.getUser().getUserName()); 
-        } else {
-            // Handle the case where user is null
-            dto.setUserId(null);
-            dto.setUserName(null);
-        }
+        if (userPost != null) {
+            dto.setId(userPost.getPostId()); 
+            dto.setContent(userPost.getContent());
+            dto.setImageUrl(userPost.getImageUrl());
+            dto.setPublishDate(userPost.getPublishDate());
 
+            // Null checks for User object to prevent NPE
+            if (userPost.getUser() != null) {
+                dto.setUserId(userPost.getUser().getUserId()); 
+                dto.setUserName(userPost.getUser().getUserName());
+            }
+        }
         return dto;
     }
+
     
     public static List<UserPostDTO> fromUserPostList(List<UserPost> posts) {
         return posts.stream()
