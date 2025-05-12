@@ -1,6 +1,9 @@
 package recources;
 
 import models.Like;
+import models.User;
+import models.UserPost;
+import service.CommentService;
 import service.LikeService;
 
 import javax.inject.Inject;
@@ -8,6 +11,8 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import dtos.LikeDTO;
+import messaging.NotificationEvent;
+import messaging.NotificationProducer;
 
 import java.util.List;
 
@@ -24,6 +29,13 @@ public class LikeResource {
     // Injecting the LikeService to handle business logic
     @Inject
     private LikeService likeService;
+    
+    @Inject
+    private CommentService commentService; // Needed to fetch user and post
+
+    @Inject
+    private NotificationProducer notificationProducer;
+
 
     // ➡️ Like a UserPost
     /**
@@ -43,6 +55,23 @@ public class LikeResource {
                 return Response.status(Response.Status.BAD_REQUEST)
                                .entity(errors)
                                .build();
+            }
+            
+            // Fetch liker and post author
+            User liker = commentService.findUserById(userId);
+            UserPost post = commentService.findUserPostById(postId);
+            User author = post != null ? post.getUser() : null;
+
+            // Send notification if not self-like
+            if (liker != null && author != null && !liker.getUserId().equals(author.getUserId())) {
+                String message = liker.getFirstName() + " liked your post.";
+                NotificationEvent event = new NotificationEvent(
+                    liker.getUserId(),
+                    author.getUserId(),
+                    "POST_LIKED",
+                    message
+                );
+                notificationProducer.sendNotification(event);
             }
 
             // Return success response if no errors
@@ -78,6 +107,23 @@ public class LikeResource {
                 return Response.status(Response.Status.BAD_REQUEST)
                                .entity(errors)
                                .build();
+            }
+            
+       	 // 2) Fetch commenter and post-author
+            User commenter = commentService.findUserById(userId);
+            UserPost post     = commentService.findUserPostById(postId);
+            User author       = post != null ? post.getUser() : null;
+
+            // 3) Send notification to author (if not commenting on own post)
+            if (commenter != null && author != null && !commenter.getUserId().equals(author.getUserId())) {
+                String message = commenter.getFirstName() + " commented on your post.";
+                NotificationEvent event = new NotificationEvent(
+                    commenter.getUserId(),
+                    author.getUserId(),
+                    "COMMENT_ADDED",
+                    message
+                );
+                notificationProducer.sendNotification(event);
             }
 
             // Return success response if no errors
