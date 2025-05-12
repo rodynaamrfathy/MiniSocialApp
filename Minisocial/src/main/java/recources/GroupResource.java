@@ -91,4 +91,40 @@ public class GroupResource {
         List<GroupMembershipDTO> dtoList = GroupMembershipDTO.fromEntityList(approvedMemberships);
         return Response.ok(dtoList).build();
     }
+    
+    @PUT
+    @Path("/{groupId}/promote/{adminId}/{targetUserId}")
+    public Response promoteToAdmin(@PathParam("adminId") Long adminId,
+                                   @PathParam("targetUserId") Long targetUserId,
+                                   @PathParam("groupId") Long groupId) {
+        Map<String, Object> response = groupService.promoteToAdmin(adminId, targetUserId, groupId);
+        if (response.containsKey("errors")) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(response).build();
+        }
+        return Response.ok(response).build();
+    }
+
+    @DELETE
+    @Path("/{groupId}/delete/{adminId}")
+    public Response deleteGroup(@PathParam("adminId") Long adminId,
+                                @PathParam("groupId") Long groupId) {
+        Map<String, Object> response = groupService.deleteGroup(adminId, groupId);
+        if (response.containsKey("errors")) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(response).build();
+        }
+        return Response.ok(response).build();
+    }
+
+    @DELETE
+    @Path("/{groupId}/remove/{adminId}/{targetUserId}")
+    public Response removeUserFromGroup(@PathParam("adminId") Long adminId,
+                                        @PathParam("targetUserId") Long targetUserId,
+                                        @PathParam("groupId") Long groupId) {
+        Map<String, Object> response = groupService.removeUserFromGroup(adminId, targetUserId, groupId);
+        if (response.containsKey("errors")) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(response).build();
+        }
+        return Response.ok(response).build();
+    }
+
 }

@@ -8,6 +8,7 @@ import Utils.PostFactory;
 import Utils.GroupPostUtil;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -19,6 +20,10 @@ public class GroupPostService {
     @PersistenceContext(unitName = "hello")
     private EntityManager em;
 
+    @Inject
+    private GroupService groupService;
+
+    
     // Method to create a GroupPost for a user within a group
     public String createGroupPost(Long userId, GroupPost post, Long groupId) {
 
@@ -122,12 +127,15 @@ public class GroupPostService {
             return "GroupPost with ID " + postId + " not found.";
         }
 
-        // Check if the user can delete the post
-        if (!GroupPostUtil.canEditAndDeletePost(user, post)) {
-            return "User does not have permission to delete this group post.";
+        Long groupId = post.getGroup().getGroupId();
+
+        boolean isCreator = post.getUser().getUserId().equals(userId);
+        boolean isAdmin = groupService.isUserAdmin(userId, groupId);
+
+        if (!isCreator && !isAdmin) {
+            return "You do not have permission to delete this group post. Only the post creator or a group admin can delete it.";
         }
 
-        // Try to delete the post
         try {
             em.remove(post);
         } catch (Exception e) {
@@ -136,6 +144,7 @@ public class GroupPostService {
 
         return "GroupPost deleted successfully";
     }
+
     
     
 }
