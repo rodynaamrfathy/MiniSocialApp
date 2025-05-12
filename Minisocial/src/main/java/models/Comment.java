@@ -12,12 +12,19 @@ public class Comment {
     @Column(name = "comment_id")
     private int commentId;
 
+    // One-to-Many relationship with UserPost
     @ManyToOne
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", nullable = true) // Allowing null for GroupPost usage
     private UserPost post;
 
+    // One-to-Many relationship with GroupPost
     @ManyToOne
-    @JoinColumn(name = "creator_id")
+    @JoinColumn(name = "group_post_id", nullable = true) // Allowing null for UserPost usage
+    private GroupPost groupPost;
+
+    // User creating the comment
+    @ManyToOne
+    @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
     @Column(name = "content", length = 250, nullable = false)
@@ -32,6 +39,14 @@ public class Comment {
 
     public UserPost getPost() { return post; }
     public void setPost(UserPost post) { this.post = post; }
+
+    public GroupPost getGroupPost() {
+        return groupPost;
+    }
+
+    public void setGroupPost(GroupPost groupPost) {
+        this.groupPost = groupPost;
+    }
 
     public User getCreator() { return creator; }
     public void setCreator(User creator) { this.creator = creator; }

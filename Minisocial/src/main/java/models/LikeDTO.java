@@ -3,46 +3,35 @@ package models;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * LikeDTO is a Data Transfer Object representing Like entity data 
+ * with associated user and post information.
+ */
 public class LikeDTO {
+
     private int likeId;
     private Long userId;
     private String userName;
     private int postId;
+    private String postType; // UserPost or GroupPost
 
     // Getters and Setters
-    public int getLikeId() {
-        return likeId;
-    }
+    public int getLikeId() { return likeId; }
+    public void setLikeId(int likeId) { this.likeId = likeId; }
 
-    public void setLikeId(int likeId) {
-        this.likeId = likeId;
-    }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
-    public Long getUserId() {
-        return userId;
-    }
+    public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
+    public int getPostId() { return postId; }
+    public void setPostId(int postId) { this.postId = postId; }
 
-    public String getUserName() {
-        return userName;
-    }
+    public String getPostType() { return postType; }
+    public void setPostType(String postType) { this.postType = postType; }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public int getPostId() {
-        return postId;
-    }
-
-    public void setPostId(int postId) {
-        this.postId = postId;
-    }
-
-    // Static method to convert a Like to a LikeDTO
+    // ✅ Convert Like entity to DTO
     public static LikeDTO fromLike(Like like) {
         LikeDTO dto = new LikeDTO();
         dto.setLikeId(like.getLikeId());
@@ -50,21 +39,23 @@ public class LikeDTO {
         if (like.getUser() != null) {
             dto.setUserId(like.getUser().getUserId());
             dto.setUserName(like.getUser().getUserName());
-        } else {
-            dto.setUserId(null);
-            dto.setUserName(null);
         }
 
         if (like.getPost() != null) {
             dto.setPostId(like.getPost().getPostId());
+            dto.setPostType("UserPost");
+        } else if (like.getGroupPost() != null) {
+            dto.setPostId(like.getGroupPost().getPostId());
+            dto.setPostType("GroupPost");
         } else {
-            dto.setPostId(-1); // Handle null post or invalid post ID if necessary
+            dto.setPostId(-1);
+            dto.setPostType("Unknown");
         }
 
         return dto;
     }
 
-    // Static method to convert a list of Like to a list of LikeDTO
+    // ✅ Convert List of Likes to DTOs
     public static List<LikeDTO> fromLikeList(List<Like> likes) {
         return likes.stream()
                     .map(LikeDTO::fromLike)

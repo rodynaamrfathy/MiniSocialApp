@@ -2,14 +2,12 @@ package recources;
 
 import models.Like;
 import models.LikeDTO;
-import models.User;
 import service.LikeService;
 
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Path("/likes")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -19,59 +17,102 @@ public class LikeResource {
     @Inject
     private LikeService likeService;
 
+    // ✅ Like a UserPost
     @POST
-    @Path("/{postId}/{userId}")
-    public Response likePost(@PathParam("postId") int postId, @PathParam("userId") Long userId) {
+    @Path("/userpost/{postId}/{userId}")
+    public Response likeUserPost(@PathParam("postId") int postId, @PathParam("userId") Long userId) {
         try {
-            User user = likeService.findUserById(userId);
-            if (user == null) {
-                return Response.status(Response.Status.NOT_FOUND)
-                        .entity("User with ID " + userId + " not found.")
-                        .build();
-            }
-
-            List<String> errors = likeService.likePost(user, postId);
+            List<String> errors = likeService.likeUserPost(userId, postId);
             if (!errors.isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                        .entity(errors)
-                        .build();
+                               .entity(errors)
+                               .build();
             }
 
             return Response.status(Response.Status.CREATED)
-                    .entity("Post liked successfully.")
-                    .build();
+                           .entity("User post liked successfully.")
+                           .build();
 
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("An unexpected error occurred: " + e.getMessage())
-                    .build();
+                           .entity("Failed to like user post: " + e.getMessage())
+                           .build();
         }
     }
 
-    @GET
-    @Path("/post/{postId}")
-    public Response getLikesForPost(@PathParam("postId") int postId) {
+ // ✅ Like a GroupPost (FIXED DTO Mapping)
+    @POST
+    @Path("/group/{groupId}/{postId}/{userId}")
+    public Response likeGroupPost(@PathParam("groupId") Long groupId, @PathParam("postId") int postId, @PathParam("userId") Long userId) {
         try {
-            List<Like> likes = likeService.getLikesForPost(postId);
-            
-            if (likes.isEmpty()) {
-                return Response.status(Response.Status.OK)
-                               .entity("No likes for this post.")
+            List<String> errors = likeService.likeGroupPost(userId, postId, groupId);
+            if (!errors.isEmpty()) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                               .entity(errors)
                                .build();
             }
-            
-            List<LikeDTO> likeDTOs = likes.stream()
-                                          .map(LikeDTO::fromLike)
-                                          .collect(Collectors.toList());
+
+            return Response.status(Response.Status.CREATED)
+                           .entity("Group post liked successfully.")
+                           .build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                           .entity("Failed to like group post: " + e.getMessage())
+                           .build();
+        }
+    }
+
+
+    // ✅ Get Likes for a UserPost (FIXED DTO Mapping)
+    @GET
+    @Path("/userpost/{postId}")
+    public Response getLikesForUserPost(@PathParam("postId") int postId) {
+        try {
+            List<Like> likes = likeService.getLikesForUserPost(postId);
+
+            if (likes.isEmpty()) {
+                return Response.status(Response.Status.OK)
+                               .entity("No likes for this user post.")
+                               .build();
+            }
+
+            List<LikeDTO> likeDTOs = LikeDTO.fromLikeList(likes);
 
             return Response.ok(likeDTOs).build();
 
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Failed to fetch likes: " + e.getMessage())
-                    .build();
+                           .entity("Failed to fetch likes for user post: " + e.getMessage())
+                           .build();
+        }
+    }
+
+    // ✅ Get Likes for a GroupPost (FIXED DTO Mapping)
+    @GET
+    @Path("/group/{groupId}/{postId}")
+    public Response getLikesForGroupPost(@PathParam("groupId") Long groupId, @PathParam("postId") int postId) {
+        try {
+            List<Like> likes = likeService.getLikesForGroupPost(postId, groupId);
+
+            if (likes.isEmpty()) {
+                return Response.status(Response.Status.OK)
+                               .entity("No likes for this group post.")
+                               .build();
+            }
+
+            List<LikeDTO> likeDTOs = LikeDTO.fromLikeList(likes);
+
+            return Response.ok(likeDTOs).build();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                           .entity("Failed to fetch likes for group post: " + e.getMessage())
+                           .build();
         }
     }
 }

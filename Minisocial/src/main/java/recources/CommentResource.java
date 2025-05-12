@@ -18,11 +18,27 @@ public class CommentResource {
     @Inject
     private CommentService commentService;
 
+    // ✅ Add Comment to UserPost
     @POST
-    @Path("/{postId}/{userId}")
-    public Response addComment(@PathParam("postId") int postId,
-                               @PathParam("userId") Long userId,
-                               Map<String, String> json) {
+    @Path("/userpost/{postId}/{userId}")
+    public Response addCommentToUserPost(@PathParam("postId") int postId,
+                                         @PathParam("userId") Long userId,
+                                         Map<String, String> json) {
+        return handleAddComment(postId, userId, json, null, "userpost");
+    }
+
+    // ✅ Add Comment to GroupPost
+    @POST
+    @Path("/grouppost/{postId}/{userId}/{groupId}")
+    public Response addCommentToGroupPost(@PathParam("postId") int postId,
+                                          @PathParam("userId") Long userId,
+                                          @PathParam("groupId") Long groupId,
+                                          Map<String, String> json) {
+        return handleAddComment(postId, userId, json, groupId, "grouppost");
+    }
+
+    // 🛠 Common Handler for Adding Comments
+    private Response handleAddComment(int postId, Long userId, Map<String, String> json, Long groupId, String type) {
         try {
             String content = json.get("content");
 
@@ -32,12 +48,19 @@ public class CommentResource {
                                .build();
             }
 
-            List<String> errors = commentService.addComment(userId, postId, content);
+            List<String> errors;
+            if ("userpost".equals(type)) {
+                errors = commentService.addCommentToUserPost(userId, postId, content);
+            } else {
+                errors = commentService.addCommentToGroupPost(userId, postId, groupId, content);
+            }
+
             if (!errors.isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
                                .entity(errors)
                                .build();
             }
+
             return Response.status(Response.Status.CREATED)
                            .entity("Comment added successfully.")
                            .build();
@@ -49,18 +72,37 @@ public class CommentResource {
         }
     }
 
+    // ✅ Get Comments for UserPost
     @GET
-    @Path("/post/{postId}")
-    public Response getCommentsForPost(@PathParam("postId") int postId) {
+    @Path("/userpost/{postId}")
+    public Response getCommentsForUserPost(@PathParam("postId") int postId) {
+        return handleGetComments(postId, null, "userpost");
+    }
+
+    // ✅ Get Comments for GroupPost
+    @GET
+    @Path("/grouppost/{postId}/{groupId}")
+    public Response getCommentsForGroupPost(@PathParam("postId") int postId,
+                                            @PathParam("groupId") Long groupId) {
+        return handleGetComments(postId, groupId, "grouppost");
+    }
+
+    // 🛠 Common Handler for Getting Comments
+    private Response handleGetComments(int postId, Long groupId, String type) {
         try {
-            List<Comment> comments = commentService.getCommentsForPost(postId);
-            
+            List<Comment> comments;
+            if ("userpost".equals(type)) {
+                comments = commentService.getCommentsForUserPost(postId);
+            } else {
+                comments = commentService.getCommentsForGroupPost(postId, groupId);
+            }
+
             if (comments.isEmpty()) {
                 return Response.status(Response.Status.OK)
                                .entity("No comments for this post.")
                                .build();
             }
-            
+
             List<CommentDTO> dtos = CommentDTO.fromCommentList(comments);
             return Response.ok(dtos).build();
         } catch (Exception e) {
