@@ -10,6 +10,7 @@ import enums.GroupMemberShipStatusEnum;
 import Utils.GroupPostUtil;
 
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
@@ -26,6 +27,11 @@ public class GroupPostService {
     @PersistenceContext(unitName = "hello")
     private EntityManager em;
 
+    @Inject
+    private GroupService groupService;
+
+    
+    // Method to create a GroupPost for a user within a group
     /**
      * Creates a new group post for a user within a specific group.
      * This method validates the existence of the user and group, validates the post content,
@@ -158,6 +164,15 @@ public class GroupPostService {
             return "GroupPost with ID " + postId + " not found.";
         }
 
+        Long groupId = post.getGroup().getGroupId();
+
+        boolean isCreator = post.getUser().getUserId().equals(userId);
+        boolean isAdmin = groupService.isUserAdmin(userId, groupId);
+
+        if (!isCreator && !isAdmin) {
+            return "You do not have permission to delete this group post. Only the post creator or a group admin can delete it.";
+        }
+
       
         if (!GroupPostUtil.canEditAndDeletePost(user, post)) {
             return "User does not have permission to delete this group post.";
@@ -172,6 +187,7 @@ public class GroupPostService {
 
         return "GroupPost deleted successfully";
     }
+
     
     /**
      * Checks if a user is a member of a specific group.

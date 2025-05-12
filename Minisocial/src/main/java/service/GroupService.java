@@ -14,7 +14,9 @@ import javax.transaction.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * GroupService
@@ -135,4 +137,109 @@ public class GroupService {
                 .setParameter("status", GroupMemberShipStatusEnum.approved)
                 .getResultList();
     }
+    
+    boolean isUserAdmin(Long userId, Long groupId) {
+        Long count = entityManager.createQuery(
+            "SELECT COUNT(gm) FROM GroupMembership gm WHERE gm.user.userId = :userId AND gm.group.groupId = :groupId AND gm.role = :role",
+            Long.class)
+            .setParameter("userId", userId)
+            .setParameter("groupId", groupId)
+            .setParameter("role", "admin")
+            .getSingleResult();
+
+        return count > 0;
+    }
+    
+   
+    public Map<String, Object> promoteToAdmin(Long currentUserId, Long targetUserId, Long groupId) {
+        Map<String, Object> result = new HashMap<>();
+        List<String> errors = new ArrayList<>();
+
+        if (!isUserAdmin(currentUserId, groupId)) {
+            errors.add("You are not authorized to promote members in this group.");
+        }
+
+        GroupMembership membership = entityManager.createQuery(
+            "SELECT gm FROM GroupMembership gm WHERE gm.user.userId = :uid AND gm.group.groupId = :gid",
+            GroupMembership.class)
+            .setParameter("uid", targetUserId)
+            .setParameter("gid", groupId)
+            .getResultStream().findFirst().orElse(null);
+
+        if (membership == null) {
+            errors.add("Target user is not a member of the group.");
+        }
+
+        if (!errors.isEmpty()) {
+            result.put("errors", errors);
+            return result;
+        }
+
+        membership.setRole("admin");
+        entityManager.merge(membership);
+        result.put("message", "User promoted to admin successfully.");
+        return result;
+    }
+    
+    
+    public Map<String, Object> deleteGroup(Long userId, Long groupId) {
+        Map<String, Object> result = new HashMap<>();
+        List<String> errors = new ArrayList<>();
+
+        if (!isUserAdmin(userId, groupId)) {
+            errors.add("You are not authorized to delete this group.");
+        }
+
+        Group group = entityManager.find(Group.class, groupId);
+        if (group == null) {
+            errors.add("Group not found.");
+        }
+
+        if (!errors.isEmpty()) {
+            result.put("errors", errors);
+            return result;
+        }
+
+        // Remove memberships first due to foreign key constraints
+        entityManager.createQuery("DELETE FROM GroupMembership gm WHERE gm.group.groupId = :gid")
+            .setParameter("gid", groupId).executeUpdate();
+
+        entityManager.remove(group);
+        result.put("message", "Group deleted successfully.");
+        return result;
+    }
+    
+   
+    public Map<String, Object> removeUserFromGroup(Long adminId, Long targetUserId, Long groupId) {
+        Map<String, Object> result = new HashMap<>();
+        List<String> errors = new ArrayList<>();
+
+        if (!isUserAdmin(adminId, groupId)) {
+            errors.add("You are not authorized to remove members from this group.");
+        }
+
+        GroupMembership membership = entityManager.createQuery(
+            "SELECT gm FROM GroupMembership gm WHERE gm.user.userId = :uid AND gm.group.groupId = :gid",
+            GroupMembership.class)
+            .setParameter("uid", targetUserId)
+            .setParameter("gid", groupId)
+            .getResultStream().findFirst().orElse(null);
+
+        if (membership == null) {
+            errors.add("Target user is not a member of the group.");
+        }
+
+        if (!errors.isEmpty()) {
+            result.put("errors", errors);
+            return result;
+        }
+
+        entityManager.remove(membership);
+        result.put("message", "User removed from group.");
+        return result;
+    }
+
+
+
+
 }
