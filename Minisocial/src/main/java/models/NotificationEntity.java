@@ -25,8 +25,9 @@ public class NotificationEntity {
     private Instant timestamp;
     private Boolean isRead = false;
     
-    @OneToMany(mappedBy = "notificationsRecived")
-    private User userId;
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 
     public NotificationEntity() {
         this.timestamp = Instant.now();

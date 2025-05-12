@@ -97,9 +97,8 @@ public class User {
     @OneToMany(mappedBy = "receiver")
     private Set<FriendshipRequests> receivedRequests;
     
-    @OneToMany
-    @JoinColumn(name = "notificationId")
-    private List<NotificationEntity> notificationsRecived;
+    @OneToMany(mappedBy = "user")
+    private Set<NotificationEntity> notificationsRecived;
 
 
     // ✅ All Getters & Setters...
