@@ -5,51 +5,51 @@ import java.util.Date;
 import enums.FriendshipStatus;
 
 /**
- * 📨 FriendshipRequests Entity – Relationships Summary 📮
+ * Represents a friendship request between two users.
  * 
- * Represents a pending or past request:
+ * This entity maps the relationship of friend requests:
+ *  One user (requester) sends requests to others (receiver).
+ *  Tracks status (PENDING, ACCEPTED, REJECTED) and timestamp.
  * 
- * [User] ---1---------------------< [FriendshipRequests] >---------------------1--- [User]
- *       (as requester)                                       (as receiver)
- * 
- * Each row is a friend request from one user to another.
- * Status is tracked using Enum: PENDING, ACCEPTED, REJECTED.
+ * Associations:
+ *  Many requests can be sent by one requester.
+ *  Many requests can be received by one receiver.
  */
-
 @Entity
 public class FriendshipRequests {
 
-    // 🔑 Primary Key
+    /** Primary key: Unique ID of the friendship request. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int friendship_request_id;
 
-    // 👈 Many requests by same requester (User)
+    /** The user who sent the friendship request. */
     @ManyToOne
     @JoinColumn(name = "requester_id")
     private User requester;
 
-    // 👉 Many requests received by same receiver (User)
+    /** The user who received the friendship request. */
     @ManyToOne
     @JoinColumn(name = "receiver_id")
     private User receiver;
 
-    // 📌 Enum for request status (PENDING, ACCEPTED, REJECTED)
+    /** Current status of the request (PENDING, ACCEPTED, REJECTED). */
     @Enumerated(EnumType.STRING)
     private FriendshipStatus status;
 
-    // ⏰ Timestamp of the request
+    /** The date when the friendship request was created. */
     @Temporal(TemporalType.DATE)
     private Date timestamp;
 
-    // ✅ All Getters & Setters...
-    
-    public FriendshipRequests () {}
+    /** Default constructor. */
+    public FriendshipRequests() {}
+
+    // === Getters and Setters ===
 
     public int getFriendshipRequestId() {
         return friendship_request_id;
     }
-    
+
     public void setFriendshipRequestId(int friendship_request_id) {
         this.friendship_request_id = friendship_request_id;
     }
@@ -77,7 +77,7 @@ public class FriendshipRequests {
     public void setStatus(FriendshipStatus status) {
         this.status = status;
     }
-    
+
     public Date getTimeStamp() {
         return timestamp;
     }
@@ -86,7 +86,7 @@ public class FriendshipRequests {
         this.timestamp = timestamp;
     }
 
-    // 📝 toString() method for a readable string representation of the FriendshipRequests entity
+    /** Returns a string representation of the friendship request. */
     @Override
     public String toString() {
         return "FriendshipRequests{" +

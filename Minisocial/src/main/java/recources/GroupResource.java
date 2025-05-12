@@ -1,7 +1,6 @@
 package recources;
 
 import models.GroupMembership;
-import models.GroupMembershipDTO;
 import service.GroupService;
 import service.GroupService.GroupCreationResult;
 
@@ -10,18 +9,19 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 
 import dtos.GroupDTO;
+import dtos.GroupMembershipDTO;
 
 import java.util.*;
 
 /**
- * 📦 GroupResource
+ * GroupResource
  *
  * RESTful resource for managing group-related operations.
- * Exposes endpoints for:
+ * Exposes end points for:
  * - Creating groups with admin assignment
  * - Retrieving approved group members
  *
- * ➡ Works with GroupService to handle business logic.
+ * Works with GroupService to handle business logic.
  */
 @Path("/groups")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -29,13 +29,13 @@ import java.util.*;
 public class GroupResource {
 
     /**
-     * 🛠️ Injected instance of GroupService to perform group operations.
+     * Injected instance of GroupService to perform group operations.
      */
     @Inject
     private GroupService groupService;
 
     /**
-     * 🏗️ Endpoint to create a new group and assign an admin.
+     * End point to create a new group and assign an admin.
      *
      * 🔗 URL: POST /groups/create/{adminId}
      *
@@ -49,14 +49,14 @@ public class GroupResource {
         try {
             GroupCreationResult result = groupService.createGroup(groupDTO, adminId);
 
-            // Handle validation errors
+        
             if (result.errors != null && !result.errors.isEmpty()) {
                 Map<String, Object> errorResponse = new HashMap<>();
                 errorResponse.put("errors", result.errors);
                 return Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
             }
 
-            // Return created group DTO
+         
             return Response.status(Response.Status.CREATED).entity(result.groupDTO).build();
 
         } catch (Exception e) {
@@ -68,9 +68,9 @@ public class GroupResource {
     }
 
     /**
-     * 🔍 Endpoint to retrieve all approved members of a group.
+     * End point to retrieve all approved members of a group.
      *
-     * 🔗 URL: GET /groups/members/{groupId}
+     * URL: GET /groups/members/{groupId}
      *
      * @param groupId The ID of the group.
      * @return Response with list of approved GroupMembershipDTOs or error if none found.
@@ -80,14 +80,13 @@ public class GroupResource {
     public Response getAllApprovedMembersInGroup(@PathParam("groupId") Long groupId) {
         List<GroupMembership> approvedMemberships = groupService.getApprovedMembershipsByGroupId(groupId);
 
-        // Handle case when no members are found
         if (approvedMemberships.isEmpty()) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity(Collections.singletonMap("errors", Collections.singletonList("No members found for the group with ID: " + groupId)))
                     .build();
         }
 
-        // Convert entities to DTOs and return response
+     
         List<GroupMembershipDTO> dtoList = GroupMembershipDTO.fromEntityList(approvedMemberships);
         return Response.ok(dtoList).build();
     }

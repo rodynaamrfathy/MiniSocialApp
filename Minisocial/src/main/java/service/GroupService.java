@@ -19,17 +19,17 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 📦 GroupService
+ * GroupService
  *
  * This stateless EJB handles business logic related to Group management,
  * including group creation, membership assignment, and retrieval of approved group members.
  * 
- * 💡 Responsibilities:
+ * Responsibilities:
  * - Validating admin user existence and group name uniqueness
  * - Persisting new groups and admin memberships
  * - Fetching approved group memberships
  *
- * ➡ Works closely with:
+ * Works closely with:
  * - GroupUtil for validation logic
  * - EntityManager for database operations
  */
@@ -37,13 +37,13 @@ import java.util.Map;
 public class GroupService {
 
     /**
-     * 🗄️ EntityManager instance for interacting with the persistence context.
+     * EntityManager instance for interacting with the persistence context.
      */
     @PersistenceContext
     private EntityManager entityManager;
 
     /**
-     * 📦 GroupCreationResult
+     * GroupCreationResult
      *
      * Helper class to encapsulate the result of group creation operation.
      * Can return either a successfully created GroupDTO or a list of validation errors.
@@ -77,9 +77,9 @@ public class GroupService {
     }
 
     /**
-     * 🏗️ Creates a new group and assigns the given user as the admin.
+     * Creates a new group and assigns the given user as the admin.
      *
-     * 🔍 Steps:
+     * Steps:
      * - Validates admin user existence.
      * - Checks for group name uniqueness.
      * - Persists the new group.
@@ -124,7 +124,7 @@ public class GroupService {
     }
 
     /**
-     * 🔍 Retrieves all approved memberships for a given group.
+     * Retrieves all approved memberships for a given group.
      *
      * @param groupId The ID of the group.
      * @return List of approved GroupMembership entities.

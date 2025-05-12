@@ -4,10 +4,16 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
+
+import dtos.GroupPostDTO;
+import models.Group;
 import models.GroupPost;
-import models.GroupPostDTO;
 import service.GroupPostService;
 
+/**
+ * GroupPostResource class provides RESTful end points for managing group posts.
+ * Includes operations for creating, editing, retrieving, and deleting group posts.
+ */
 @Path("/groupPosts")
 @Produces("application/json")
 @Consumes("application/json")
@@ -16,7 +22,14 @@ public class GroupPostResource {
     @Inject
     GroupPostService groupPostService;
 
-    // Method to create a GroupPost for a user within a group
+    /**
+     * Creates a group post for a user within a group.
+     * 
+     * @param userId The ID of the user creating the post
+     * @param groupId The ID of the group where the post is being created
+     * @param groupPostDTO The DTO containing the content and image URL of the post
+     * @return A response containing the created group post or an error message
+     */
     @POST
     @Path("/createGroupPost/{userId}/{groupId}")
     public Response createGroupPostForUser(@PathParam("userId") Long userId, 
@@ -31,24 +44,29 @@ public class GroupPostResource {
 
             if (result.contains("validation failed") || result.contains("does not exist") || result.contains("error")) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                               .entity(result)  // Return the exact message from the service
+                               .entity(result)
                                .build();
             }
 
-            GroupPostDTO createdGroupPostDTO = GroupPostDTO.fromGroupPost(groupPost);
             return Response.status(Response.Status.CREATED)
-                           .entity(createdGroupPostDTO)
+                           .entity("Post Created Successfully!")
                            .build();
         } catch (Exception e) {
             e.printStackTrace();
-
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("An error occurred while creating the group post.")
                            .build();
         }
     }
 
-    // Method to edit an existing group post
+    /**
+     * Edits an existing group post.
+     * 
+     * @param userId The ID of the user editing the post
+     * @param postId The ID of the post being edited
+     * @param groupPostDTO The DTO containing the updated content and image URL of the post
+     * @return A response containing the result of the edit operation or an error message
+     */
     @PUT
     @Path("/edit/{userId}/{postId}")
     public Response editGroupPost(@PathParam("userId") Long userId, 
@@ -59,7 +77,7 @@ public class GroupPostResource {
 
             if (result.contains("validation failed") || result.contains("does not exist")) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                               .entity(result) 
+                               .entity(result)
                                .build();
             }
 
@@ -74,11 +92,36 @@ public class GroupPostResource {
         }
     }
 
-    // Method to get all group posts by groupId
+    /**
+     * Retrieves all group posts for a specific group.
+     * 
+     * @param userid The ID of the User which will view the group time line and should be a member 
+     * @param groupId The ID of the group whose posts are being retrieved
+     * @return A response containing a list of group posts or an error message
+     */
     @GET
-    @Path("/{groupId}")
-    public Response getAllGroupPostsByGroup(@PathParam("groupId") Long groupId) {
+    @Path("/grouptimeline/{userId}/{groupId}")
+    public Response getAllGroupPostsByGroup(@PathParam("userId") Long userId, 
+                                             @PathParam("groupId") Long groupId) {
         try {
+            // Check if Group Exists
+            Group group = groupPostService.findGroupById(groupId);
+            if (group == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                               .entity("Group with ID " + groupId + " does not exist.")
+                               .build();
+            }
+
+            // Check if the user is a member of the group
+            boolean isMember = groupPostService.isUserMemberOfGroup(userId, groupId);
+
+            if (!isMember) {
+                return Response.status(Response.Status.FORBIDDEN)
+                               .entity("User is not a member of the group. Please join the group first.")
+                               .build();
+            }
+
+            // Retrieve the posts
             List<GroupPostDTO> groupPosts = groupPostService.getAllGroupPosts(groupId);
 
             if (groupPosts == null || groupPosts.isEmpty()) {
@@ -87,19 +130,27 @@ public class GroupPostResource {
                                .build();
             }
 
+            // Return found posts
             return Response.status(Response.Status.OK)
                            .entity(groupPosts)
                            .build();
+
         } catch (Exception e) {
             e.printStackTrace();
-
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("An error occurred while fetching group posts.")
                            .build();
         }
     }
 
-    // Method to delete a group post
+
+    /**
+     * Deletes a group post.
+     * 
+     * @param userId The ID of the user attempting to delete the post
+     * @param postId The ID of the post being deleted
+     * @return A response containing the result of the delete operation or an error message
+     */
     @DELETE
     @Path("/delete/{userId}/{postId}")
     public Response deleteGroupPost(@PathParam("userId") Long userId, @PathParam("postId") int postId) {
@@ -108,23 +159,18 @@ public class GroupPostResource {
 
             if (result.contains("not found") || result.contains("does not have permission")) {
                 return Response.status(Response.Status.BAD_REQUEST)
-                               .entity(result)  // Return the exact message from the service
+                               .entity(result)
                                .build();
             }
 
             return Response.status(Response.Status.OK)
-                           .entity(result)  // Success message
+                           .entity(result)
                            .build();
         } catch (Exception e) {
             e.printStackTrace();
-
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("An error occurred while deleting the group post.")
                            .build();
         }
     }
-
-    
-    
-
 }

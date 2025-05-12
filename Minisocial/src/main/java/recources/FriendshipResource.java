@@ -1,33 +1,66 @@
 package recources;
 
 import enums.FriendshipStatus;
+import messaging.ActivityLogEvent;
+import messaging.ActivityLogProducer;
 import messaging.NotificationEvent;
 import messaging.NotificationProducer;
 import models.FriendshipRequests;
 import models.User;
 import service.FriendshipService;
 import service.UserService;
+
 import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.*;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+/**
+ * FriendshipResource – Handles friendship-related REST end points for managing friend requests, suggestions, and friendships.
+ * 
+ * This class exposes several RESTful web services for managing friendships:
+ *   - Send, accept, reject friend requests.
+ *   - Get pending requests and friend suggestions.
+ *   - Retrieve all friends and friend profiles.
+ * 
+ * Key Responsibilities:
+ *   - Sends friend requests and handles acceptance/rejection.
+ *   - Suggests friends based on the user’s network.
+ *   - Manages friend profiles with visibility checks.
+ */
 @Path("/friendships")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class FriendshipResource {
 
+    /** Service for managing friendships */
     @Inject
     private FriendshipService friendshipService;
 
+    /** 🧑‍🤝‍🧑 Service for managing users */
     @Inject
     private UserService userService;
     
+    /** Producer for sending notification events */
     @Inject
     private NotificationProducer notificationProducer;
     
+<<<<<<< HEAD
+    /**
+     * Get suggested friends for a user.
+     * 
+     * This method returns a list of users who are recommended as potential friends for the given user.
+     * 
+     * @param userId The ID of the user requesting friend suggestions.
+     * @return Response containing the list of suggested friends or a message if no suggestions exist.
+     */
+=======
+    @Inject
+    private ActivityLogProducer activityLogProducer;
+    
+    
+>>>>>>> abd03d5ce0325ac573dac2762219035a663f4f3a
     @GET
     @Path("/{userId}/suggestions")
     public Response getSuggestedFriends(@PathParam("userId") Long userId) {
@@ -45,6 +78,16 @@ public class FriendshipResource {
         return Response.ok(suggestedInfos).build();
     }
 
+    /**
+     * Send a friend request from one user to another.
+     * 
+     * This method initiates a friend request from the requester to the receiver.
+     * It also sends a notification to the receiver about the request.
+     * 
+     * @param requesterId The ID of the user sending the request.
+     * @param receiverId The ID of the user receiving the request.
+     * @return Response indicating whether the request was successfully sent.
+     */
     @POST
     @Path("/{requesterId}/request/{receiverId}")
     public Response sendFriendRequest(@PathParam("requesterId") Long requesterId,
@@ -56,11 +99,9 @@ public class FriendshipResource {
             return Response.status(Response.Status.NOT_FOUND).entity("User not found.").build();
         }
 
-        // Check for self-request and existing requests
         if (friendshipService.isSelfRequest(requester, receiver)) {
             return Response.status(Response.Status.BAD_REQUEST)
-                           .entity("â�Œ You can't send a friend request to yourself.")
-                           .build();
+                           .entity("🚫 You can't send a friend request to yourself.").build();
         }
 
         boolean success = friendshipService.sendFriendRequest(requester, receiver);
@@ -70,7 +111,7 @@ public class FriendshipResource {
                            .build();
         }
 
-     //  Send Notification
+        // Send a notification to the receiver about the new friend request
         String message = requester.getFirstName() + " " + requester.getLastName() + " sent you a friend request.";
         NotificationEvent event = new NotificationEvent(
             requester.getUserId(),
@@ -83,9 +124,16 @@ public class FriendshipResource {
         return Response.status(Response.Status.CREATED)
                        .entity("Friend request sent successfully.")
                        .build();
-        
     }
 
+    /**
+     * Accept a pending friend request.
+     * 
+     * This method accepts a pending friend request by updating its status.
+     * 
+     * @param requestId The ID of the pending friend request to accept.
+     * @return Response indicating the success or failure of the request acceptance.
+     */
     @POST
     @Path("/accept/{requestId}")
     public Response acceptFriendRequest(@PathParam("requestId") int requestId) {
@@ -98,12 +146,26 @@ public class FriendshipResource {
         }
 
         boolean success = friendshipService.acceptFriendRequest(request);
+        
+		// log activity
+        activityLogProducer.sendActivityLog(
+        	    new ActivityLogEvent((long) requestId, "friend added", "")
+        	);
+        
         return success ? Response.ok("Friend request accepted.").build()
                        : Response.status(Response.Status.BAD_REQUEST)
                                  .entity("Failed to accept friend request.")
                                  .build();
     }
 
+    /**
+     * Reject a pending friend request.
+     * 
+     * This method rejects a pending friend request by updating its status.
+     * 
+     * @param requestId The ID of the pending friend request to reject.
+     * @return Response indicating the success or failure of the request rejection.
+     */
     @POST
     @Path("/reject/{requestId}")
     public Response rejectFriendRequest(@PathParam("requestId") int requestId) {
@@ -122,6 +184,14 @@ public class FriendshipResource {
                                  .build();
     }
 
+    /**
+     * Get all pending friendship requests for a user.
+     * 
+     * This method retrieves all pending friendship requests for a user.
+     * 
+     * @param userId The ID of the user whose pending requests are being queried.
+     * @return Response containing a list of pending requests or a message if no pending requests exist.
+     */
     @GET
     @Path("/{userId}/pending")
     public Response getAllFriendshipRequests(@PathParam("userId") Long userId) {
@@ -136,6 +206,14 @@ public class FriendshipResource {
         return Response.ok(friendshipRequests).build();
     }
 
+    /**
+     * Get a specific friendship request by its ID.
+     * 
+     * This method retrieves the details of a friendship request by its ID.
+     * 
+     * @param requestId The ID of the friendship request to retrieve.
+     * @return Response containing the friendship request details or an error message.
+     */
     @GET
     @Path("/request/{requestId}")
     public Response getFriendshipRequestById(@PathParam("requestId") int requestId) {
@@ -150,6 +228,14 @@ public class FriendshipResource {
         return Response.ok(request).build();
     }
 
+    /**
+     * Get all friends of a user.
+     * 
+     * This method retrieves the list of all friends for a given user.
+     * 
+     * @param userId The ID of the user whose friends are being queried.
+     * @return Response containing the list of friends or an error message.
+     */
     @GET
     @Path("/{userId}/friends")
     public Response getAllFriends(@PathParam("userId") Long userId) {
@@ -166,7 +252,15 @@ public class FriendshipResource {
         return Response.ok(friendInfos).build();
     }
 
-
+    /**
+     * Get the profile of a friend.
+     * 
+     * This method retrieves the profile information of a friend if the user is friends with them.
+     * 
+     * @param userId The ID of the user requesting the friend profile.
+     * @param friendId The ID of the friend whose profile is being requested.
+     * @return Response containing the friend profile or an error message.
+     */
     @GET
     @Path("/friendProfile/{userId}/{friendId}")
     public Response getFriendProfile(@PathParam("userId") Long userId,
