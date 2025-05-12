@@ -1,54 +1,90 @@
 package models;
 
-
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 /**
- * 🧾 UserPost – Relationships Summary 🧾
+ * UserPost Entity
  * 
- * Subclass of Post:
- *   🔹 Inherits: comments, likes, content, imageUrl, publishDate
+ * A subclass of Post representing a post authored by a user.
  * 
- * [UserPost] ---N-------------------> [User]      (N : 1)
- *                 (author)
- *
- * Legend:
- *   -->  Many-to-One (N:1)
+ * Inherits:
+ *   - Comments
+ *   - Likes
+ *   - Content
+ *   - Image URL
+ *   - Publish Date
+ * 
+ * Relationships:
+ *   - Many-to-One → {@link User}
  */
-
 @Entity
 public class UserPost extends Post {
-	public UserPost() {
-	    // Required for JSON-B and JPA
-	}
 
+    /** Default constructor required for JSON-B and JPA */
+    public UserPost() {}
+
+    /**
+     * Returns a string representation of the UserPost.
+     * 
+     * @return Formatted string with the user reference.
+     */
     @Override
-	public String toString() {
-		return "UserPost [user=" + user + "]";
-	}
+    public String toString() {
+        return "UserPost [user=" + user + "]";
+    }
 
-	public User getUser() {
-		return user;
-	}
+    /**
+     * Gets the user who authored the post.
+     * 
+     * @return The {@link User} associated with this post.
+     */
+    @Override
+    public User getUser() {
+        return user;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    /**
+     * Sets the user (author) of the post.
+     * 
+     * @param user The {@link User} to associate with the post.
+     */
+    @Override
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	/** 👤 Author of the user post */
+    /**
+     * Author reference: Many UserPosts can belong to one User.
+     * 
+     * Mapped via the foreign key column `user_id`.
+     */
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
- // In UserPost.java
+    /**
+     * Gets the group associated with this post.
+     * 
+     * Not applicable for UserPost. Always returns {@code null}.
+     * 
+     * @return {@code null} (no group associated).
+     */
     @Override
     public Group getGroup() {
-        return null;  // No group for UserPost
+        return null;
     }
+
+    /**
+     * Gets the discriminator type of this post.
+     * 
+     * Used in the joined inheritance strategy.
+     * 
+     * @return A string representing the post type: "USER_POST"
+     */
     @Override
     public String getType() {
-        return "USER_POST"; // Return a string identifier specific to user posts
+        return "USER_POST";
     }
 }

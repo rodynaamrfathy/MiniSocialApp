@@ -37,7 +37,7 @@ public class LikeResource {
     private NotificationProducer notificationProducer;
 
 
-    // ➡️ Like a UserPost
+    // Like a UserPost
     /**
      * Allows a user to like a specific UserPost.
      *
@@ -49,7 +49,7 @@ public class LikeResource {
     @Path("/userpost/{postId}/{userId}")
     public Response likeUserPost(@PathParam("postId") int postId, @PathParam("userId") Long userId) {
         try {
-            // Attempt to like the UserPost
+          
             List<String> errors = likeService.likeUserPost(userId, postId);
             if (!errors.isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -57,12 +57,12 @@ public class LikeResource {
                                .build();
             }
             
-            // Fetch liker and post author
+     
             User liker = commentService.findUserById(userId);
             UserPost post = commentService.findUserPostById(postId);
             User author = post != null ? post.getUser() : null;
 
-            // Send notification if not self-like
+           
             if (liker != null && author != null && !liker.getUserId().equals(author.getUserId())) {
                 String message = liker.getFirstName() + " liked your post.";
                 NotificationEvent event = new NotificationEvent(
@@ -74,7 +74,7 @@ public class LikeResource {
                 notificationProducer.sendNotification(event);
             }
 
-            // Return success response if no errors
+    
             return Response.status(Response.Status.CREATED)
                            .entity("User post liked successfully.")
                            .build();
@@ -88,7 +88,7 @@ public class LikeResource {
         }
     }
 
-    // ➡️ Like a GroupPost (with DTO Mapping)
+    // Like a GroupPost (with DTO Mapping)
     /**
      * Allows a user to like a specific GroupPost within a group.
      *
@@ -101,7 +101,7 @@ public class LikeResource {
     @Path("/group/{groupId}/{postId}/{userId}")
     public Response likeGroupPost(@PathParam("groupId") Long groupId, @PathParam("postId") int postId, @PathParam("userId") Long userId) {
         try {
-            // Attempt to like the GroupPost
+       
             List<String> errors = likeService.likeGroupPost(userId, postId, groupId);
             if (!errors.isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
@@ -109,12 +109,12 @@ public class LikeResource {
                                .build();
             }
             
-       	 // 2) Fetch commenter and post-author
+       
             User commenter = commentService.findUserById(userId);
             UserPost post     = commentService.findUserPostById(postId);
             User author       = post != null ? post.getUser() : null;
 
-            // 3) Send notification to author (if not commenting on own post)
+          
             if (commenter != null && author != null && !commenter.getUserId().equals(author.getUserId())) {
                 String message = commenter.getFirstName() + " commented on your post.";
                 NotificationEvent event = new NotificationEvent(
@@ -126,13 +126,13 @@ public class LikeResource {
                 notificationProducer.sendNotification(event);
             }
 
-            // Return success response if no errors
+       
             return Response.status(Response.Status.CREATED)
                            .entity("Group post liked successfully.")
                            .build();
 
         } catch (Exception e) {
-            // Log and return failure response in case of error
+       
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("Failed to like group post: " + e.getMessage())
@@ -140,7 +140,7 @@ public class LikeResource {
         }
     }
 
-    // ➡️ Get Likes for a UserPost (with DTO Mapping)
+    // Get Likes for a UserPost (with DTO Mapping)
     /**
      * Retrieves all likes for a specific UserPost.
      *
@@ -151,7 +151,7 @@ public class LikeResource {
     @Path("/userpost/{postId}")
     public Response getLikesForUserPost(@PathParam("postId") int postId) {
         try {
-            // Fetch likes for the specified UserPost
+          
             List<Like> likes = likeService.getLikesForUserPost(postId);
 
             if (likes.isEmpty()) {
@@ -161,10 +161,10 @@ public class LikeResource {
                                .build();
             }
 
-            // Convert Like entities to DTOs
+           
             List<LikeDTO> likeDTOs = LikeDTO.fromLikeList(likes);
 
-            // Return the list of likes as a response
+           
             return Response.ok(likeDTOs).build();
 
         } catch (Exception e) {
@@ -176,7 +176,7 @@ public class LikeResource {
         }
     }
 
-    // ➡️ Get Likes for a GroupPost (with DTO Mapping)
+    // Get Likes for a GroupPost (with DTO Mapping)
     /**
      * Retrieves all likes for a specific GroupPost within a group.
      *
@@ -188,24 +188,24 @@ public class LikeResource {
     @Path("/group/{groupId}/{postId}")
     public Response getLikesForGroupPost(@PathParam("groupId") Long groupId, @PathParam("postId") int postId) {
         try {
-            // Fetch likes for the specified GroupPost
+        
             List<Like> likes = likeService.getLikesForGroupPost(postId, groupId);
 
             if (likes.isEmpty()) {
-                // Return message if no likes exist for the post
+             
                 return Response.status(Response.Status.OK)
                                .entity("No likes for this group post.")
                                .build();
             }
 
-            // Convert Like entities to DTOs
+          
             List<LikeDTO> likeDTOs = LikeDTO.fromLikeList(likes);
 
-            // Return the list of likes as a response
+         
             return Response.ok(likeDTOs).build();
 
         } catch (Exception e) {
-            // Log and return failure response in case of error
+          
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("Failed to fetch likes for group post: " + e.getMessage())

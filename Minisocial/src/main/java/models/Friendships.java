@@ -1,76 +1,70 @@
 package models;
 
 import javax.persistence.*;
-import java.util.Date; 
+import java.util.Date;
 
 /**
- * 🤝 Friendships Entity – Relationships Summary 🧂
+ * Represents a confirmed friendship between two users.
  * 
- * Represents a confirmed bidirectional friendship:
+ * This entity models a bidirectional friendship relationship:
+ *  One user adds another as a friend.
+ *  Tracks the friendship creation date.
  * 
- * [User] ---1---------------------< [Friendships] >---------------------1--- [User]
- *       (as user)                                           (as friend)
- * 
- * Each row is a single record of a friendship between two users.
+ * Associations:
+ *  Many friendships can be initiated by one user.
+ *  Many friendships can refer to the same friend.
  */
-
 @Entity
 public class Friendships {
 
-    // 🔑 Primary Key
+    /** Primary key: Unique ID of the friendship record. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int friendship_id;
 
-    // 👤 User who added the friend
+    /** The user who added the friend. */
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    // 👥 The friend that was added
+    /** The friend that was added. */
     @ManyToOne
     @JoinColumn(name = "friend_id")
     private User friend;
 
-    // 📆 Since when they are friends
+    /** The date when the friendship was established. */
     @Temporal(TemporalType.DATE)
     private Date since;
 
-    // ✅ Constructor
+    /** Default constructor. */
     public Friendships() {}
+
+    // === Getters and Setters ===
 
     public int getFriendshipId() {
         return friendship_id;
     }
 
-    public int getFriendship_id() {
-        return friendship_id;
-    }
-
-    public void setFriendship_id(int friendship_id) {
-        this.friendship_id = friendship_id;
-    }
-
     public void setFriendshipId(int friendship_id) {
         this.friendship_id = friendship_id;
     }
-    
+
     public User getUser() {
         return user;
     }
-    
+
     public void setUser(User user) {
         this.user = user;
     }
-    
+
     public User getFriend() {
         return friend;
     }
-    
+
     public void setFriend(User friend) {
         this.friend = friend;
     }
-    
+
     public Date getSince() {
         return since;
     }
@@ -79,7 +73,7 @@ public class Friendships {
         this.since = since;
     }
 
-    // 📝 toString() method for a readable string representation of the Friendships entity
+    /** Returns a string representation of the friendship record. */
     @Override
     public String toString() {
         return "Friendships{" +

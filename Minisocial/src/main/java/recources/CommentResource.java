@@ -49,12 +49,12 @@ public class CommentResource {
                                          @PathParam("userId") Long userId,
                                          Map<String, String> json) {
     	
-    	 // 2) Fetch commenter and post-author
+    	
         User commenter = commentService.findUserById(userId);
         UserPost post     = commentService.findUserPostById(postId);
         User author       = post != null ? post.getUser() : null;
 
-        // 3) Send notification to author (if not commenting on own post)
+      
         if (commenter != null && author != null && !commenter.getUserId().equals(author.getUserId())) {
             String message = commenter.getFirstName() + " commented on your post.";
             NotificationEvent event = new NotificationEvent(
@@ -67,7 +67,7 @@ public class CommentResource {
         }
 
     	
-        // Delegating the logic to the common handler method for adding comments
+      
         return handleAddComment(postId, userId, json, null, "userpost");
     }
 
@@ -87,12 +87,12 @@ public class CommentResource {
                                           @PathParam("groupId") Long groupId,
                                           Map<String, String> json) {
     	
-        // 2) Fetch commenter and post-author
+     
         User commenter = commentService.findUserById(userId);
         GroupPost post  = commentService.findGroupPostById(postId);
         User author     = post != null ? post.getUser() : null;
 
-        // 3) Send notification to author (if not commenting on own group post)
+     
         if (commenter != null && author != null && !commenter.getUserId().equals(author.getUserId())) {
             String message = commenter.getFirstName() + " commented on your group post in \"" 
                            + post.getGroup().getGroupName() + "\".";
@@ -105,7 +105,7 @@ public class CommentResource {
             notificationProducer.sendNotification(event);
         }
         
-        // Delegating the logic to the common handler method for adding comments
+   
         return handleAddComment(postId, userId, json, groupId, "grouppost");
     }
 
@@ -121,17 +121,17 @@ public class CommentResource {
      */
     private Response handleAddComment(int postId, Long userId, Map<String, String> json, Long groupId, String type) {
         try {
-            // Extracting the comment content from the request
+         
             String content = json.get("content");
 
-            // Checking if the content is valid
+      
             if (content == null || content.trim().isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
                                .entity("Content field is required.")
                                .build();
             }
 
-            // Calling the appropriate service method based on the post type
+ 
             List<String> errors;
             if ("userpost".equals(type)) {
                 errors = commentService.addCommentToUserPost(userId, postId, content);
@@ -139,20 +139,20 @@ public class CommentResource {
                 errors = commentService.addCommentToGroupPost(userId, postId, groupId, content);
             }
 
-            // Handling any errors from the service layer
+        
             if (!errors.isEmpty()) {
                 return Response.status(Response.Status.BAD_REQUEST)
                                .entity(errors)
                                .build();
             }
 
-            // Returning a success response if the comment was added successfully
+         
             return Response.status(Response.Status.CREATED)
                            .entity("Comment added successfully.")
                            .build();
         } catch (Exception e) {
             e.printStackTrace();
-            // Returning an internal server error response in case of an exception
+      
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("Failed to add comment: " + e.getMessage())
                            .build();
@@ -181,7 +181,7 @@ public class CommentResource {
     @Path("/grouppost/{postId}/{groupId}")
     public Response getCommentsForGroupPost(@PathParam("postId") int postId,
                                             @PathParam("groupId") Long groupId) {
-        // Delegating the logic to the common handler method for retrieving comments
+   
         return handleGetComments(postId, groupId, "grouppost");
     }
 
@@ -203,19 +203,19 @@ public class CommentResource {
                 comments = commentService.getCommentsForGroupPost(postId, groupId);
             }
 
-            // Handling the case where no comments exist
+         
             if (comments.isEmpty()) {
                 return Response.status(Response.Status.OK)
                                .entity("No comments for this post.")
                                .build();
             }
 
-            // Converting the comments to DTOs and returning them in the response
+      
             List<CommentDTO> dtos = CommentDTO.fromCommentList(comments);
             return Response.ok(dtos).build();
         } catch (Exception e) {
             e.printStackTrace();
-            // Returning an internal server error response in case of an exception
+   
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("Failed to fetch comments: " + e.getMessage())
                            .build();

@@ -6,135 +6,156 @@ import java.util.Set;
 import javax.persistence.*;
 
 /**
- * 📸 Post (Abstract) – Relationships Summary 📘
- *
- * Superclass for all post types (UserPost, GroupPost)
+ * Abstract Entity: Post
  * 
- * [Post] <---1----------------------< [Comment]      (1 : N)
- * [Post] <---1----------------------< [Like]         (1 : N)
+ * Base class for all post types in the system (UserPost, GroupPost).
+ * Handles shared attributes and relationships like content, image, likes, and comments.
  * 
- * Child Types:
- *   🔹 [UserPost] – Post by a user
- *   🔹 [GroupPost] – Post within a group
+ * Relationships:
+ * - 1 Post -> N Comments
+ * - 1 Post -> N Likes
  * 
- * Inheritance: JOINED (Table-per-subclass) with discriminator column "post_type"
- *
- * Legend:
- *   -->  One-to-Many (1:N)
+ * Inheritance Strategy:
+ * - Table-per-subclass (JOINED)
+ * - Discriminator column: "post_type"
  */
-
-
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "post_type")
 public abstract class Post {
 
-    /** 🔑 Unique ID for each post */
+    /** Primary Key: Unique identifier for each post */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int postId;
 
-    /** 📅 Date when the post was published */
+    /** Date when the post was published */
     @Temporal(TemporalType.DATE)
     protected Date publishDate;
 
-    @Override
-	public String toString() {
-		return "Post [postId=" + postId + ", publishDate=" + publishDate + ", imageUrl=" + imageUrl + ", content="
-				+ content + ", comments=" + comments + ", likes=" + likes + ", likesCount=" + likesCount + "]";
-	}
-
-	public int getPostId() {
-		return postId;
-	}
-
-	public void setPostId(int postId) {
-		this.postId = postId;
-	}
-
-	public Date getPublishDate() {
-		return publishDate;
-	}
-
-	public void setPublishDate(Date publishDate) {
-		this.publishDate = publishDate;
-	}
-
-	public String getImageUrl() {
-		return imageUrl;
-	}
-
-	public void setImageUrl(String imageUrl) {
-		this.imageUrl = imageUrl;
-	}
-
-	public String getContent() {
-		return content;
-	}
-
-	public void setContent(String content) {
-		this.content = content;
-	}
-
-	public Set<Comment> getComments() {
-		return comments;
-	}
-
-	public void setComments(Set<Comment> comments) {
-		this.comments = comments;
-	}
-
-	public Set<Like> getLikes() {
-		return likes;
-	}
-
-	public void setLikes(Set<Like> likes) {
-		this.likes = likes;
-	}
-
-	public int getLikesCount() {
-		return likesCount;
-	}
-
-	public void setLikesCount(int likesCount) {
-		this.likesCount = likesCount;
-	}
-	
-	public int getCommentsCount() {
-		return commentsCount;
-	}
-
-	public void setCommentsCount(int commentsCount) {
-		this.commentsCount = commentsCount;
-	}
-
-	/** 🖼️ Optional image URL attached to the post */
+    /** 🖼️ Optional image URL attached to the post */
     protected String imageUrl;
 
-    /** 📝 Content of the post (Max 50 chars) */
+    /** Main content of the post (max 50 characters) */
     @Column(length = 50)
     protected String content;
 
-    /** 💬 One-to-many relationship with Comment (reverse mapped by 'post') */
+    /** Comments linked to this post (1:N relationship) */
     @OneToMany(mappedBy = "post")
     private Set<Comment> comments;
 
-    /** ❤️ One-to-many relationship with Like (reverse mapped by 'post') */
+    /** Likes linked to this post (1:N relationship) */
     @OneToMany(mappedBy = "post")
     private Set<Like> likes;
 
-    /** 🔢 Cached count of likes for optimization */
+    /** Cached count of likes for performance optimization */
     protected int likesCount;
-    
+
+    /** Cached count of comments for performance optimization */
     protected int commentsCount;
-    
-    /** 👤 Abstract getter for the post author (User) */
+
+    // ====================  Getters & Setters ====================
+
+    public int getPostId() {
+        return postId;
+    }
+
+    public void setPostId(int postId) {
+        this.postId = postId;
+    }
+
+    public Date getPublishDate() {
+        return publishDate;
+    }
+
+    public void setPublishDate(Date publishDate) {
+        this.publishDate = publishDate;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public Set<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(Set<Comment> comments) {
+        this.comments = comments;
+    }
+
+    public Set<Like> getLikes() {
+        return likes;
+    }
+
+    public void setLikes(Set<Like> likes) {
+        this.likes = likes;
+    }
+
+    public int getLikesCount() {
+        return likesCount;
+    }
+
+    public void setLikesCount(int likesCount) {
+        this.likesCount = likesCount;
+    }
+
+    public int getCommentsCount() {
+        return commentsCount;
+    }
+
+    public void setCommentsCount(int commentsCount) {
+        this.commentsCount = commentsCount;
+    }
+
+    // ====================  Abstract Methods ====================
+
+    /**
+     * Retrieves the User (author) associated with this post.
+     * @return User entity who created the post
+     */
     public abstract User getUser();
 
-	public abstract Group getGroup();
+    /**
+     * Retrieves the Group associated with this post (if applicable).
+     * @return Group entity or null if not a group post
+     */
+    public abstract Group getGroup();
 
-	public abstract void setUser(User user);
+    /**
+     * Sets the User (author) for this post.
+     * @param user User entity to associate as author
+     */
+    public abstract void setUser(User user);
 
-	public abstract String getType();
+    /**
+     * Retrieves the post type identifier (e.g., "UserPost", "GroupPost").
+     * @return String representing post type
+     */
+    public abstract String getType();
 
+    // ====================  Utility ====================
+
+    @Override
+    public String toString() {
+        return "Post [postId=" + postId +
+                ", publishDate=" + publishDate +
+                ", imageUrl=" + imageUrl +
+                ", content=" + content +
+                ", comments=" + comments +
+                ", likes=" + likes +
+                ", likesCount=" + likesCount + "]";
+    }
 }

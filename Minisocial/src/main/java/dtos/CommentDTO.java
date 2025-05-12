@@ -9,7 +9,7 @@ import models.Comment;
  * The CommentDTO (Data Transfer Object) class represents the data structure used for transferring
  * comment information. It is a simplified version of the Comment model, intended for use in API responses.
  *
- * This DTO includes the comment's ID, creator's details, post ID, content, and timestamp.
+ * This DTO includes the comment's ID, creator's details, post ID, content, and time stamp.
  */
 public class CommentDTO {
     
@@ -132,16 +132,16 @@ public class CommentDTO {
     }
 
     /**
-     * Gets the timestamp of when the comment was created.
-     * @return the comment timestamp.
+     * Gets the time stamp of when the comment was created.
+     * @return the comment time stamp.
      */
     public Date getTimestamp() { 
         return timestamp; 
     }
 
     /**
-     * Sets the timestamp of when the comment was created.
-     * @param timestamp the timestamp to set.
+     * Sets the time stamp of when the comment was created.
+     * @param timestamp the time stamp to set.
      */
     public void setTimestamp(Date timestamp) { 
         this.timestamp = timestamp; 

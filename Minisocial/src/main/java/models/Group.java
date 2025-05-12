@@ -1,46 +1,57 @@
 package models;
 
 import javax.persistence.*;
+import dtos.GroupAdmins;
+
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * 💡 Represents a social group in the platform.
+ *  Represents a social group within the platform.
+ * 
+ * A group allows users to post content, manage memberships,
+ * and define administrators. Groups can be open (anyone can join)
+ * or closed (requires approval).
+ * 
+ * Associations:
+ * - Has many {@link GroupPost} (posts in the group)
+ * - Has many {@link GroupMembership} (memberships)
+ * - Has many {@link GroupAdmins} (administrators)
  */
 @Entity
-@Table(name = "Groups") // ✅ Use a non-reserved name
+@Table(name = "Groups") // ✅ Avoid SQL reserved keyword conflict
 public class Group {
 
-    /** 🔑 Primary key for the group */
+    /** Primary key: Unique identifier for the group. */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long groupId;
 
-    /** 🏷️ Name of the group */
+    /** The name/title of the group. */
     @Column(nullable = false)
     private String groupName;
 
-    /** 📝 Description of the group */
+    /** A short description of the group's purpose. */
     private String description;
 
-    /** 🔓 Whether the group is open to join without approval */
+    /** Defines if the group is open to public joining (without approval). */
     @Column(nullable = false)
     private Boolean isOpen;
 
-    /** 📝 Posts belonging to the group */
+    /** Posts that belong to this group. */
     @OneToMany(mappedBy = "group")
     private Set<GroupPost> groupPosts = new HashSet<>();
 
-    /** 👥 Membership records for this group */
+    /** Membership records for users in this group. */
     @OneToMany(mappedBy = "group")
     private Set<GroupMembership> memberships = new HashSet<>();
 
-    /** 🔐 Admins for the group */
+    /** Admins who manage this group. */
     @OneToMany
-    @JoinColumn(name = "group_id")  // Explicit join column
+    @JoinColumn(name = "group_id")  // Explicit foreign key join
     private Set<GroupAdmins> groupAdmins = new HashSet<>();
 
-    // 🛠️ Getters & Setters
+    // === Getters and Setters ===
 
     public Long getGroupId() {
         return groupId;
@@ -98,6 +109,7 @@ public class Group {
         this.memberships = memberships;
     }
 
+    /** Returns a string representation of the group. */
     @Override
     public String toString() {
         return "Group{" +

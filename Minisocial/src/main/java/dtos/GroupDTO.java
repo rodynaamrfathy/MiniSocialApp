@@ -3,12 +3,12 @@ package dtos;
 import models.Group;
 
 /**
- * 📦 GroupDTO
+ * GroupDTO
  *
  * Data Transfer Object (DTO) representing the Group entity.
  * Used to transfer group data between layers (Entity ➡ DTO ➡ API).
  *
- * ✅ Fields:
+ * Fields:
  * - groupId (Long): Unique identifier of the group.
  * - groupName (String): Name of the group.
  * - description (String): Brief description about the group.
@@ -17,28 +17,28 @@ import models.Group;
 public class GroupDTO {
 
     /**
-     * 🆔 Unique identifier of the group.
+     * Unique identifier of the group.
      */
     private Long groupId;
 
     /**
-     * 📝 Name of the group.
+     * Name of the group.
      */
     private String groupName;
 
     /**
-     * 📄 Description of the group.
+     * Description of the group.
      */
     private String description;
 
     /**
-     * 🔓 Determines if the group is open for direct joining.
+     * Determines if the group is open for direct joining.
      * true = open, false = requires admin approval.
      */
     private Boolean isOpen;
 
     // ============================
-    // 🚀 Getters and Setters
+    // Getters and Setters
     // ============================
 
     public Long getGroupId() {
