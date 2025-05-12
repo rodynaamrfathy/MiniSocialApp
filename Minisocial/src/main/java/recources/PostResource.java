@@ -19,13 +19,11 @@ public class PostResource {
     @Inject
     PostService postService;
 
-<<<<<<< HEAD
     
     @Inject
     private ActivityLogProducer activityLogProducer;
     
-=======
->>>>>>> refs/remotes/origin/main
+
     @GET
     @Path("/timeline/{userId}")
     public Response getUserTimeline(@PathParam("userId") Long userId) {
