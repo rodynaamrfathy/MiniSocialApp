@@ -67,9 +67,7 @@ public class LikeResource {
             UserPost post = commentService.findUserPostById(postId);
             User author = post != null ? post.getUser() : null;
 
-<<<<<<< HEAD
-           
-=======
+
 
 			// log activity
             activityLogProducer.sendActivityLog(
@@ -77,7 +75,6 @@ public class LikeResource {
             	);
             
             // Send notification if not self-like
->>>>>>> abd03d5ce0325ac573dac2762219035a663f4f3a
             if (liker != null && author != null && !liker.getUserId().equals(author.getUserId())) {
                 String message = liker.getFirstName() + " liked your post.";
                 NotificationEvent event = new NotificationEvent(

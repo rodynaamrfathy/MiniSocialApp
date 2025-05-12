@@ -2,6 +2,7 @@ package recources;
 
 import java.util.List;
 import javax.inject.Inject;
+import javax.persistence.PersistenceException;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
@@ -155,8 +156,17 @@ public class GroupPostResource {
     @Path("/delete/{userId}/{postId}")
     public Response deleteGroupPost(@PathParam("userId") Long userId, @PathParam("postId") int postId) {
         try {
+            // Check if the IDs are valid (optional, but useful for debugging)
+            if (userId == null || postId <= 0) {
+                return Response.status(Response.Status.BAD_REQUEST)
+                               .entity("Invalid userId or postId")
+                               .build();
+            }
+
+            // Call the service to delete the post
             String result = groupPostService.deleteGroupPost(userId, postId);
 
+            // Check for permission issues or post not found
             if (result.contains("not found") || result.contains("does not have permission")) {
                 return Response.status(Response.Status.BAD_REQUEST)
                                .entity(result)
@@ -166,11 +176,19 @@ public class GroupPostResource {
             return Response.status(Response.Status.OK)
                            .entity(result)
                            .build();
+        } catch (PersistenceException pe) {
+            // Handle database-related exceptions
+            pe.printStackTrace();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                           .entity("Database error while deleting the group post.")
+                           .build();
         } catch (Exception e) {
+            // Log the exception stack trace for debugging
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
                            .entity("An error occurred while deleting the group post.")
                            .build();
         }
     }
+
 }

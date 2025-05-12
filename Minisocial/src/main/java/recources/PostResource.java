@@ -5,12 +5,9 @@ import javax.inject.Inject;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Response;
 
-<<<<<<< HEAD
 import dtos.UserPostDTO;
-=======
 import messaging.ActivityLogEvent;
 import messaging.ActivityLogProducer;
->>>>>>> abd03d5ce0325ac573dac2762219035a663f4f3a
 import models.UserPost;
 import service.PostService;
 
@@ -37,20 +34,18 @@ public class PostResource {
     @Inject
     PostService postService;
 
-<<<<<<< HEAD
     /**
      * GET /posts/time line/{userId} - Retrieves the time line of posts for a specific user.
      * 
      * @param userId The ID of the user whose time line is being fetched.
      * @return A Response containing the list of user posts or an error message.
      */
-=======
+
     
     @Inject
     private ActivityLogProducer activityLogProducer;
     
 
->>>>>>> abd03d5ce0325ac573dac2762219035a663f4f3a
     @GET
     @Path("/timeline/{userId}")
     public Response getUserTimeline(@PathParam("userId") Long userId) {
@@ -135,20 +130,17 @@ public class PostResource {
                         .build();
             }
 
-<<<<<<< HEAD
-            
 
-=======
             UserPostDTO createdPostDTO = UserPostDTO.fromUserPost(userPost);
 			// log activity
             activityLogProducer.sendActivityLog(
             	    new ActivityLogEvent(userId, "Created a Post",  " ")
             	);
             
->>>>>>> abd03d5ce0325ac573dac2762219035a663f4f3a
             return Response.status(Response.Status.CREATED)
                     .entity("Post Created Successfully!")
                     .build();
+            
         } catch (Exception e) {
             e.printStackTrace();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
