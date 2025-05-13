@@ -17,13 +17,13 @@ import java.util.List;
 public class GroupUtil {
 
     /**
-     * 🔍 JPQL query to check if a group with the specified name already exists.
+     * JPQL query to check if a group with the specified name already exists.
      */
     public static final String CHECK_GROUP_NAME_EXISTS_QUERY =
             "SELECT COUNT(g) FROM Group g WHERE g.groupName = :name";
 
     // ============================
-    // ✅ Validation Methods
+    // Validation Methods
     // ============================
 
     /**
@@ -43,7 +43,7 @@ public class GroupUtil {
     }
 
     /**
-     * ✅ Validates the uniqueness of a group name.
+     * Validates the uniqueness of a group name.
      *
      * @param groupName      Group name to validate.
      * @param entityManager  JPA EntityManager for database access.
